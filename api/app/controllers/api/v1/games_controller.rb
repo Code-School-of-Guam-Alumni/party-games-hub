@@ -7,28 +7,28 @@ module Api
           name: "Rule Wheel",
           summary: "Spin for a house rule that stays active during the game night.",
           play_mode: "shared screen",
-          milestone: "first playable"
+          owner: "Kiko"
         },
         {
           slug: "matching",
           name: "Matching",
           summary: "Flip cards and collect matching pairs.",
           play_mode: "pass the device",
-          milestone: "round two"
+          owner: "Ron"
         },
         {
           slug: "guess-the-number",
           name: "Guess the Number",
           summary: "Choose a secret number and see who gets closest.",
           play_mode: "pass the device",
-          milestone: "round two"
+          owner: "Lanna"
         },
         {
           slug: "imposter",
           name: "Imposter",
           summary: "Blend in, share clues, and identify the player who does not know the word.",
           play_mode: "pass the device",
-          milestone: "team stretch"
+          owner: "Leon"
         }
       ].freeze
 

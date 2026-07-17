@@ -2,7 +2,7 @@
 
 ## Goal
 
-Build a polished, mobile-first party game hub that gives four contributors real experience with Rails, React, GitHub issues, short-lived branches, pull requests, testing, review, and responsible use of Pi.
+Build a polished, mobile-first party game hub that gives four contributors real experience with Rails, React, owned task branches, pull requests, testing, review, and responsible use of Pi.
 
 ## Primary use case
 
@@ -18,7 +18,7 @@ A group opens the website on a phone or laptop and shares or passes the device w
 - Rails-provided game/rule catalog
 - Helpful loading, empty, and error states
 
-### Rule Wheel — first playable
+### Rule Wheel — Kiko
 
 - Select a family-friendly rule pack
 - Spin the wheel
@@ -28,18 +28,29 @@ A group opens the website on a phone or laptop and shares or passes the device w
 - Reset the current session
 - Prevent accidental duplicate active rules
 
-### Round two
+### Matching — Ron
 
-- Matching Game
-- Guess the Number
+- Flip cards and find matching pairs
+- Track matched cards and completion
+- Replay/reset a finished game
 
-### Team stretch
+### Guess the Number — Lanna
 
-- Imposter pass-the-device flow
+- Choose a number range
+- Collect guesses
+- Show the closest player or a tie
+- Rotate the secret-number role
+
+### Imposter — Leon
+
+- Private pass-the-device role reveal
+- Secret word and related hint
+- Clue rounds and voting
+- Replay/reset flow
 
 ## Backend responsibility
 
-Rails owns the source-of-truth catalog for games, rule packs, and rules. React owns temporary round interactions and presentation. PostgreSQL persistence should be introduced through a bounded issue after the initial static API contract is understood.
+Rails owns source-of-truth game content such as rule packs, card packs, range presets, and secret-word packs. React owns temporary round interactions and presentation. Each owner introduces PostgreSQL-backed content through the API step documented in `docs/GAME_ASSIGNMENTS.md`.
 
 ## Explicitly out of scope for Phase 1
 

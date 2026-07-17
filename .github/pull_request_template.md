@@ -2,7 +2,7 @@
 
 <!-- Describe the behavior and why it is needed. -->
 
-Closes #
+Assignment step:
 
 ## How did you test it?
 
@@ -32,7 +32,7 @@ What did Pi/AI help with?
 
 ## Contributor check
 
-- [ ] I read `AGENTS.md` and the linked issue.
+- [ ] I read `AGENTS.md` and my step in `docs/GAME_ASSIGNMENTS.md`.
 - [ ] I can explain the changed code.
 - [ ] I did not commit credentials, `.env` files, Rails master keys, or generated artifacts.
 - [ ] This PR is small enough for another team member to review.
