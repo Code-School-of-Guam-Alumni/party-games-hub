@@ -1,71 +1,125 @@
 # Contributing
 
-## Branches
+Use the Code School of Guam guide as the main Git and pull-request workflow:
 
-`main` must stay runnable. Do not commit directly to it.
+**[CSG Guide: Git and GitHub Pull Requests](https://github.com/Code-School-of-Guam-Alumni/Resources/blob/main/web-development/02-git-github/guide_git_and_github_pull_requests.md)**
 
-Use short-lived task branches:
+This file adds only the project-specific rules for Party Games Hub.
+
+## One owner, one task, one branch
+
+Each game has one primary owner, but a game is built through multiple small task branches and pull requests. Do not keep one large game branch open for the whole project.
+
+Only the branch owner should commit to that branch. Teammates can review, suggest changes, or pair with the owner without pushing unrelated work into the branch.
+
+Examples:
 
 ```text
-feat/ron-rule-wheel
-feat/kiko-active-rules
-feat/lanna-game-library
-fix/ron-wheel-animation
-chore/leon-ci-setup
+kiko-rule-wheel-skeleton
+kiko-rule-wheel-api
+kiko-rule-wheel-gameplay
+ron-matching-skeleton
+lanna-guess-number-skeleton
+leon-imposter-skeleton
 ```
 
-A person owns a workstream, not one permanent branch. Start every task from the latest `main`:
+See [`docs/GAME_ASSIGNMENTS.md`](docs/GAME_ASSIGNMENTS.md) for ownership and the planned PR sequence.
+
+## Start a task
+
+Start from an updated `main`, following the commands students already use in the CSG guide:
 
 ```bash
-git switch main
-git pull --ff-only
-git switch -c feat/your-name-short-task
+git checkout main
+git pull origin main
+git checkout -b your-branch-name
 ```
 
-## Commits
+To return to a branch that already exists locally:
 
-Prefer small, descriptive commits:
-
-```text
-feat: add rule wheel selection logic
-fix: prevent duplicate active rules
- test: cover closest-number tie
- docs: clarify WSL PostgreSQL setup
+```bash
+git checkout your-branch-name
 ```
 
-## Pull requests
+Confirm the branch before editing:
+
+```bash
+git branch --show-current
+git status
+```
+
+Do not work directly on `main`.
+
+## Save and push your work
+
+Write code, check that it works, and commit in understandable chunks:
+
+```bash
+git status
+git add --all
+git commit -m "Add Rule Wheel page skeleton"
+```
+
+Before opening the pull request, bring in the latest team changes:
+
+```bash
+git pull origin main
+```
+
+Resolve any conflicts, test again, and then push your branch:
+
+```bash
+git push origin your-branch-name
+```
+
+Go to GitHub, click **Compare & pull request**, complete the PR template, and ask another team member for a review.
+
+## Pull-request rules
 
 Every PR must:
 
-- Link its GitHub issue.
-- Describe what changed and why.
-- State exactly how it was tested.
-- Disclose how Pi/AI was used.
+- Represent one clear task from `docs/GAME_ASSIGNMENTS.md`.
+- Explain what changed and why.
+- State exactly how the work was tested.
+- Disclose how Pi/AI helped.
 - Include screenshots for visible UI changes.
-- Stay small enough for another team member to understand.
-- Receive at least one human approval before merge.
+- Be understandable and demoable by the branch owner.
+- Receive at least one human approval.
+- Pass the required `api` and `web` checks.
 
-Leon is the default final merger during the first milestone. Lanna may review product copy, rules, and UX; Ron and Kiko should review each other's implementation where practical.
+Leon is the default final merger during the first milestone. Another teammate should still review and approve the work.
+
+## After the PR is merged
+
+Return to `main`, get the merged work, and delete the old local branch:
+
+```bash
+git checkout main
+git pull origin main
+git branch -D your-branch-name
+```
+
+Then create a **new branch from the updated `main`** for the next task. Do not continue new work on the branch that was already merged.
 
 ## Definition of done
 
-A task is done only when:
+A task is done when:
 
-- Acceptance criteria are met.
-- Tests/lint/build pass.
+- The planned step in `docs/GAME_ASSIGNMENTS.md` is complete.
 - The contributor can explain the code.
+- Relevant tests, lint, and builds pass.
+- The feature works locally.
 - The PR is reviewed and merged.
-- The issue is closed.
-- The branch is deleted.
+- The branch is deleted after merge.
 
 ## Pi usage
 
-Good Pi requests are bounded:
+A good Pi request is bounded to the current branch:
 
-> Read issue #4 and `AGENTS.md`. Explain your plan, then help me implement only the wheel-selection utility and its tests.
+> Read `AGENTS.md` and my assigned step in `docs/GAME_ASSIGNMENTS.md`. I am on `kiko-rule-wheel-skeleton`. Explain the plan and help me build only the Rule Wheel skeleton for this PR.
 
-Bad Pi requests hide the learning:
+A bad request hides the learning and creates an unreviewable change:
 
-> Build the whole app and push it.
+> Build my entire game and push it.
 
-If Pi writes code you cannot explain, do not open the PR yet.
+Pi can do a lot, but the branch owner must read, run, test, and explain everything in the PR.

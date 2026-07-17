@@ -2,29 +2,27 @@
 
 A mobile-first web collection of pass-the-device party games built by the Code School of Guam alumni internship team.
 
-**Status:** Project foundation and first playable milestone
+**Status:** Project foundation and game-skeleton milestone
 
 ## Team
 
-- **Leon** — technical lead, architecture, integration, review, and deployment
-- **Lanna** — product/game rules, game-library experience, UX copy, and Imposter co-lead
-- **Ron** — Rule Wheel first playable, then Matching
-- **Kiko** — rule packs/active rules, then Guess the Number
-
-Ownership is documented in [`docs/WORKSTREAMS.md`](docs/WORKSTREAMS.md). It defines lanes, not permanent personal branches.
+- Leon
+- Lanna
+- Ron
+- Kiko
 
 ## Product direction
 
 The MVP is a responsive web app that works well on phones and laptops. Players share or pass a device. The default content is family-friendly and does not require alcohol.
 
-Planned games:
+Planned games and owners:
 
-1. **Rule Wheel** — first playable milestone
-2. **Matching** — round two
-3. **Guess the Number** — round two
-4. **Imposter** — team stretch milestone
+1. **Rule Wheel** — Kiko
+2. **Matching** — Ron
+3. **Guess the Number** — Lanna
+4. **Imposter** — Leon
 
-See [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md) and [`docs/GAME_RULES.md`](docs/GAME_RULES.md).
+See [`docs/GAME_ASSIGNMENTS.md`](docs/GAME_ASSIGNMENTS.md), [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md), and [`docs/GAME_RULES.md`](docs/GAME_RULES.md).
 
 ## Stack
 
@@ -68,10 +66,10 @@ Open `http://localhost:5173`.
 
 ## How we work
 
-1. Pick a bounded GitHub issue.
-2. Update `main`.
-3. Create a short-lived branch such as `feat/ron-rule-wheel`.
-4. Use Pi to help with the issue, but read and understand every change.
+1. Review your next step in `docs/GAME_ASSIGNMENTS.md`.
+2. Run `git checkout main` and `git pull origin main`.
+3. Create a task branch with `git checkout -b branch-name`.
+4. Use Pi to help with the task, but read and understand every change.
 5. Run the relevant tests and build.
 6. Open a small pull request using the repository template.
 7. Get at least one human review before merging.
@@ -81,7 +79,7 @@ Read [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`AGENTS.md`](AGENTS.md) before ma
 
 ## Communication
 
-WhatsApp is used for quick coordination and meeting reminders. GitHub Issues and pull requests are the source of truth for tasks, acceptance criteria, decisions, code discussion, and completion.
+WhatsApp is used for coordination and questions. `docs/GAME_ASSIGNMENTS.md` defines the work split, while branches and pull requests show active and completed code work. The team is not using GitHub Issues yet.
 
 ## AI rule
 

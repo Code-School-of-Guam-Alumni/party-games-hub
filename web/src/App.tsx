@@ -6,7 +6,7 @@ type Game = {
   name: string
   summary: string
   play_mode: string
-  milestone: string
+  owner: string
 }
 
 const starterGames: Game[] = [
@@ -15,28 +15,28 @@ const starterGames: Game[] = [
     name: 'Rule Wheel',
     summary: 'Spin for a house rule that stays active during the game night.',
     play_mode: 'shared screen',
-    milestone: 'first playable',
+    owner: 'Kiko',
   },
   {
     slug: 'matching',
     name: 'Matching',
     summary: 'Flip cards and collect matching pairs.',
     play_mode: 'pass the device',
-    milestone: 'round two',
+    owner: 'Ron',
   },
   {
     slug: 'guess-the-number',
     name: 'Guess the Number',
     summary: 'Choose a secret number and see who gets closest.',
     play_mode: 'pass the device',
-    milestone: 'round two',
+    owner: 'Lanna',
   },
   {
     slug: 'imposter',
     name: 'Imposter',
     summary: 'Blend in, share clues, and identify the player who does not know the word.',
     play_mode: 'pass the device',
-    milestone: 'team stretch',
+    owner: 'Leon',
   },
 ]
 
@@ -85,14 +85,14 @@ function App() {
             <p className="eyebrow">Project roadmap</p>
             <h2 id="games-heading">Planned games</h2>
           </div>
-          <p>Rule Wheel is the first playable milestone.</p>
+          <p>Each game has one owner and is built through four small PRs.</p>
         </div>
 
         <div className="game-grid">
           {games.map((game) => (
             <article className="game-card" key={game.slug}>
               <div className="card-meta">
-                <span>{game.milestone}</span>
+                <span>{game.owner}</span>
                 <span>{game.play_mode}</span>
               </div>
               <h3>{game.name}</h3>

@@ -8,6 +8,6 @@ class GamesApiTest < ActionDispatch::IntegrationTest
     body = response.parsed_body
     assert_equal 4, body.fetch("games").length
     assert_equal "rule-wheel", body.fetch("games").first.fetch("slug")
-    assert_equal "team stretch", body.fetch("games").last.fetch("milestone")
+    assert_equal "Leon", body.fetch("games").last.fetch("owner")
   end
 end
