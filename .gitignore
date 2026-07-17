@@ -1,0 +1,33 @@
+# macOS / editors
+.DS_Store
+.vscode/
+.idea/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Rails
+api/config/master.key
+api/config/credentials/*.key
+api/.kamal/secrets
+api/log/*
+!api/log/.keep
+api/tmp/*
+!api/tmp/.keep
+!api/tmp/pids/
+api/tmp/pids/*
+!api/tmp/pids/.keep
+api/storage/*
+!api/storage/.keep
+api/vendor/bundle/
+
+# React / Vite
+web/node_modules/
+web/dist/
+web/.vite/
+web/coverage/
+
+# Test and coverage artifacts
+coverage/
