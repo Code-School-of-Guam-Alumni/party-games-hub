@@ -4,6 +4,13 @@ This stack is a teaching example of one feature moving from idea to finished MVP
 through four reviewable pull requests. It is an intentional exception to the
 usual team rule of merging one step before starting the next.
 
+Live stack:
+
+1. [PR #14 — skeleton](https://github.com/Code-School-of-Guam-Alumni/party-games-hub/pull/14)
+2. [PR #19 — Rails API](https://github.com/Code-School-of-Guam-Alumni/party-games-hub/pull/19)
+3. [PR #20 — playable loop](https://github.com/Code-School-of-Guam-Alumni/party-games-hub/pull/20)
+4. [PR #21 — polish](https://github.com/Code-School-of-Guam-Alumni/party-games-hub/pull/21)
+
 ```text
 main
 └── leon-imposter-skeleton       PR 1: rules, plan, and visual skeleton
