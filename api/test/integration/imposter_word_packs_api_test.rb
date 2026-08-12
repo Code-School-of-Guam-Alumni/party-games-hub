@@ -1,6 +1,11 @@
 require "test_helper"
 
 class ImposterWordPacksApiTest < ActionDispatch::IntegrationTest
+  setup do
+    ImposterWord.delete_all
+    ImposterWordPack.delete_all
+  end
+
   test "lists active packs and their words" do
     active_pack = ImposterWordPack.create!(
       name: "Everyday Mix",

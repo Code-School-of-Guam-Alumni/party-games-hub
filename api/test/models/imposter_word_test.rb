@@ -2,6 +2,8 @@ require "test_helper"
 
 class ImposterWordTest < ActiveSupport::TestCase
   setup do
+    ImposterWord.delete_all
+    ImposterWordPack.delete_all
     @pack = ImposterWordPack.create!(
       name: "Everyday Mix",
       slug: "everyday-mix",

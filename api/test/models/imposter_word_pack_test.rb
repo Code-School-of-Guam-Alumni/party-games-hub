@@ -1,6 +1,11 @@
 require "test_helper"
 
 class ImposterWordPackTest < ActiveSupport::TestCase
+  setup do
+    ImposterWord.delete_all
+    ImposterWordPack.delete_all
+  end
+
   test "requires a URL-safe unique slug" do
     ImposterWordPack.create!(
       name: "Everyday Mix",
