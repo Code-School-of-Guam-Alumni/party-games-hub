@@ -68,7 +68,7 @@ function App() {
     return () => controller.abort()
   }, [])
 
-  // PR 1 uses a small view switch so the skeleton stays dependency-free.
+  // A small view switch keeps each intern game dependency-free.
   // Shared routing can replace this when more game pages are ready.
   if (selectedGame === 'imposter') {
     return <ImposterGame onBack={() => setSelectedGame(null)} />
@@ -114,7 +114,7 @@ function App() {
                   disabled={!hasSkeleton}
                   onClick={() => setSelectedGame(game.slug)}
                 >
-                  {hasSkeleton ? 'View game skeleton' : 'Coming through a team PR'}
+                  {hasSkeleton ? 'Play Imposter' : 'Coming through a team PR'}
                 </button>
               </article>
             )
