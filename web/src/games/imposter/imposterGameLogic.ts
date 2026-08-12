@@ -33,11 +33,25 @@ export type VoteResult = {
   tally: Record<string, number>
 }
 
-function randomIndex(length: number, random: () => number) {
-  return Math.min(Math.floor(random() * length), length - 1)
+function randomIndex(length: number, random: () => number, excludedIndex = -1) {
+  if (length === 1) return 0
+
+  const selectedIndex = Math.min(Math.floor(random() * length), length - 1)
+  if (selectedIndex === excludedIndex) return (selectedIndex + 1) % length
+
+  return selectedIndex
 }
 
-export function createRound(playerNames: string[], pack: WordPack, random = Math.random): ImposterRound {
+function previousIndex<T>(items: T[], predicate: (item: T, index: number) => boolean) {
+  return items.findIndex(predicate)
+}
+
+export function createRound(
+  playerNames: string[],
+  pack: WordPack,
+  random = Math.random,
+  previousRound?: ImposterRound,
+): ImposterRound {
   if (playerNames.length < 4 || playerNames.length > 8) {
     throw new Error('Imposter requires 4–8 players.')
   }
@@ -52,8 +66,14 @@ export function createRound(playerNames: string[], pack: WordPack, random = Math
     throw new Error('Player names must be unique.')
   }
 
-  const imposterIndex = randomIndex(names.length, random)
-  const entry = pack.words[randomIndex(pack.words.length, random)]
+  const previousImposterIndex = previousRound
+    ? previousIndex(names, (_, index) => `player-${index + 1}` === previousRound.imposterId)
+    : -1
+  const previousWordIndex = previousRound
+    ? previousIndex(pack.words, (entry) => entry.word === previousRound.secretWord)
+    : -1
+  const imposterIndex = randomIndex(names.length, random, previousImposterIndex)
+  const entry = pack.words[randomIndex(pack.words.length, random, previousWordIndex)]
   const startingPlayerIndex = randomIndex(names.length, random)
   const players = names.map((name, index) => ({
     id: `player-${index + 1}`,

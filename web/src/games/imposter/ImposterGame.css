@@ -654,6 +654,41 @@
   font-weight: 700;
 }
 
+.imposter-recovery {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.imposter-recovery .imposter-secondary {
+  min-height: 44px;
+  flex: 0 0 auto;
+}
+
+.imposter-rules {
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--imposter-line);
+  color: var(--imposter-muted);
+}
+
+.imposter-rules summary {
+  min-height: 48px;
+  padding-top: 1rem;
+  color: var(--imposter-ink);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.imposter-rules ol {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+  line-height: 1.55;
+}
+
 .imposter-page-playing {
   display: grid;
   grid-template-rows: auto 1fr;
@@ -687,6 +722,10 @@
   letter-spacing: -0.055em;
 }
 
+.imposter-game-card h1:focus {
+  outline: none;
+}
+
 .imposter-game-card > p:not(.imposter-label):not(.imposter-error) {
   margin: 1.25rem 0 0;
   color: #c8ccc2;
@@ -694,7 +733,8 @@
   line-height: 1.65;
 }
 
-.imposter-game-card > .imposter-primary {
+.imposter-game-card > .imposter-primary,
+.imposter-guess-form > .imposter-primary {
   width: 100%;
   margin-top: 2rem;
 }
@@ -760,6 +800,10 @@
   margin-top: 2rem;
 }
 
+.imposter-guess-form {
+  margin: 0;
+}
+
 .imposter-result-card dl {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -792,6 +836,40 @@
   grid-template-columns: 1fr auto;
   gap: 0.75rem;
   margin-top: 2rem;
+}
+
+.imposter-modal-backdrop {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(4, 6, 4, 0.82);
+  backdrop-filter: blur(8px);
+}
+
+.imposter-modal {
+  width: min(500px, 100%);
+  padding: clamp(1.5rem, 5vw, 2.5rem);
+  border: 1px solid rgba(255, 118, 95, 0.42);
+  border-radius: 1.25rem;
+  background: var(--imposter-surface);
+  box-shadow: 0 2rem 6rem rgba(0, 0, 0, 0.5);
+}
+
+.imposter-modal h2 {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(2.25rem, 7vw, 3.75rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+}
+
+.imposter-modal > p:not(.imposter-label) {
+  margin: 1rem 0 0;
+  color: var(--imposter-muted);
+  line-height: 1.6;
 }
 
 @media (max-width: 900px) {
