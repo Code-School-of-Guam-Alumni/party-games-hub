@@ -6,6 +6,8 @@
   --imposter-line: rgba(238, 241, 232, 0.14);
   --imposter-acid: #d8ff63;
   --imposter-coral: #ff765f;
+  position: relative;
+  isolation: isolate;
   width: min(1180px, calc(100% - 2rem));
   min-height: 100vh;
   margin: 0 auto;

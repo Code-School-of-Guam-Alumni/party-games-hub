@@ -99,7 +99,7 @@ function ImposterGame({ onBack }: ImposterGameProps) {
             through the round without being discovered.
           </p>
           <div className="imposter-facts" aria-label="Game details">
-            <span>3–8 players</span>
+            <span>4–8 players</span>
             <span>5–10 minutes</span>
             <span>Pass the device</span>
           </div>

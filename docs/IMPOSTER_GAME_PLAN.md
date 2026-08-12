@@ -36,8 +36,7 @@ Party Games Hub should use the familiar structure without copying another game's
 
 ### Players
 
-- Support 3–8 named players.
-- Recommend 4–8 players for the best balance.
+- Support 4–8 named players.
 - Assign exactly one Imposter.
 - Keep multiple Imposters and special roles out of the MVP.
 
@@ -80,9 +79,10 @@ If the group is tied:
 
 1. Each tied player gives one additional clue.
 2. The group votes again between those players.
-3. The app records the group's final accused player.
+3. If the second vote produces a single accused player, the app records that player.
+4. If the second vote is also tied, nobody is eliminated and all active players begin another clue round.
 
-The app should not randomly eliminate someone because deduction—not chance—should decide the result.
+The app should not randomly eliminate someone because deduction—not chance—should decide the result. A no-elimination round also prevents one player from becoming an arbitrary tie-breaker.
 
 ### Elimination and additional rounds
 
@@ -278,7 +278,7 @@ Branch: `leon-imposter-polish`
 The first real group test should answer:
 
 1. Are related hints too easy or too difficult?
-2. Is three-player mode enjoyable enough to retain?
+2. Does four-player mode feel balanced, or should the minimum group be larger?
 3. Does a final guess make the Imposter too strong?
 4. How long should discussion last before the game drags?
 5. Is public group voting comfortable, or do players want private ballots?
