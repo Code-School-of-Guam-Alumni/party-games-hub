@@ -1,5 +1,8 @@
 # Mac mini production deployment
 
+For routine health checks, reboot behavior, and recovery commands, start with
+[`QUICK_OPERATIONS.md`](QUICK_OPERATIONS.md).
+
 Party Games Hub is a public, low-volume classroom application. GitHub-hosted
 Actions build immutable ARM64 images after CI passes on `main`. The Mac mini
 polls the public workflow result, checks out the matching released commit,
@@ -23,10 +26,11 @@ loopback. GitHub builds run on GitHub-hosted runners; the mini is not a
 self-hosted Actions runner and does not store a GitHub token.
 
 Party Games has a dedicated Colima profile with host-directory mounting
-disabled. This lets its system LaunchDaemon recover the app before console login. Immich
-remains in the default Colima profile and starts from its Homebrew LaunchAgent
-after Jerry logs in because that VM requires the external T9 share. The Party
-Games VM never mounts T9; the host mounts T9 only for the backup script.
+disabled. This lets its system LaunchDaemon recover the app before console
+login. Immich remains in the default Colima profile and starts from its
+Homebrew LaunchAgent after Jerry logs in because that VM requires the external
+T9 share. The Party Games VM never mounts T9; the host mounts T9 only for the
+backup script.
 
 ## Required host file
 

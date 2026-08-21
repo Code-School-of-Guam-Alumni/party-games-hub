@@ -95,7 +95,9 @@ exact commit from the latest successful publish workflow.
 
 The production Compose stack, deployment scripts, backup procedure, launchd
 services, and recovery steps are documented in
-[`ops/mac-mini/README.md`](ops/mac-mini/README.md).
+[`ops/mac-mini/README.md`](ops/mac-mini/README.md). For the short operational
+version, use
+[`ops/mac-mini/QUICK_OPERATIONS.md`](ops/mac-mini/QUICK_OPERATIONS.md).
 
 ## AI rule
 
