@@ -30,8 +30,9 @@ for label in \
   sudo launchctl bootstrap system "$destination_plist"
 done
 
-# The boot daemon replaces the login-only Homebrew LaunchAgent.
-launchctl bootout "gui/$(id -u)" "$HOME/Library/LaunchAgents/homebrew.mxcl.colima.plist" 2>/dev/null || true
-launchctl disable "gui/$(id -u)/homebrew.mxcl.colima" || true
+# Party Games uses its own boot-safe profile. The default Colima profile still
+# starts at login because Immich needs the external T9 share, which macOS does
+# not permit Virtualization.framework to attach before console login.
+launchctl enable "gui/$(id -u)/homebrew.mxcl.colima" || true
 
-echo "Installed Party Games and Colima boot services."
+echo "Installed Party Games boot services; the Immich Colima login agent remains enabled."

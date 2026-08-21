@@ -73,8 +73,11 @@ if [[ -f "$STATE_FILE" ]]; then
 fi
 
 if [[ "$latest_sha" == "$current_sha" ]] && [[ "${FORCE_DEPLOY:-0}" != "1" ]]; then
-  echo "Party Games is already running $latest_sha."
-  exit 0
+  if "$SERVICE_DIR/ops/mac-mini/healthcheck.sh" >/dev/null 2>&1; then
+    echo "Party Games is already running $latest_sha."
+    exit 0
+  fi
+  echo "Party Games records $latest_sha but is not healthy; reconciling the release."
 fi
 
 if [[ "${SKIP_REPOSITORY_SYNC:-0}" != "1" ]]; then

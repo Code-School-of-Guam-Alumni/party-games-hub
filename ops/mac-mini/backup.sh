@@ -23,6 +23,12 @@ source "$ENV_FILE"
 set +a
 
 backup_dir=${PARTY_GAMES_BACKUP_DIR:-/Volumes/T9/Backups/party-games-hub/postgres}
+
+if [[ "$backup_dir" == /Volumes/T9/* ]] && ! /sbin/mount | grep -Fq ' on /Volumes/T9 '; then
+  echo "T9 is not mounted; refusing to write a backup into the system-disk mount point." >&2
+  exit 1
+fi
+
 mkdir -p "$backup_dir"
 
 timestamp=$(date -u +%Y%m%dT%H%M%SZ)

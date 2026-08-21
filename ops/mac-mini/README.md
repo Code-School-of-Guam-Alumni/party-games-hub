@@ -1,5 +1,8 @@
 # Mac mini production deployment
 
+For routine health checks, reboot behavior, and recovery commands, start with
+[`QUICK_OPERATIONS.md`](QUICK_OPERATIONS.md).
+
 Party Games Hub is a public, low-volume classroom application. GitHub-hosted
 Actions build immutable ARM64 images after CI passes on `main`. The Mac mini
 polls the public workflow result, checks out the matching released commit,
@@ -15,10 +18,19 @@ and records the commit only after health checks pass.
 - Public origin: `https://party-games.shimizu-technology.com`
 - Database backups: `/Volumes/T9/Backups/party-games-hub/postgres`
 - Images: public GHCR packages tagged `sha-<full commit SHA>`
+- Docker profile: `party-games` (2 CPUs, 2 GiB memory, 20 GiB disk)
+- Docker socket: `/Users/jerry/.colima/party-games/docker.sock`
 
 The app uses a dedicated Compose network and volume. Host ports bind only to
 loopback. GitHub builds run on GitHub-hosted runners; the mini is not a
 self-hosted Actions runner and does not store a GitHub token.
+
+Party Games has a dedicated Colima profile with host-directory mounting
+disabled. This lets its system LaunchDaemon recover the app before console
+login. Immich remains in the default Colima profile and starts from its
+Homebrew LaunchAgent after Jerry logs in because that VM requires the external
+T9 share. The Party Games VM never mounts T9; the host mounts T9 only for the
+backup script.
 
 ## Required host file
 
@@ -63,10 +75,14 @@ migration.
 
 ## Launch services
 
-`install-launchd.sh` installs boot-level services for Colima, deployment
-polling, daily backups, and the Cloudflare tunnel. The Colima daemon replaces
-the previous login-only LaunchAgent. Validate the full setup with an unattended
-reboot before treating the service as boot-resilient.
+`install-launchd.sh` installs boot-level services for the dedicated Party Games
+Colima profile, deployment polling, daily backups, and the Cloudflare tunnel.
+It leaves the default Colima login agent enabled for Immich. Validate the full
+setup with an unattended reboot before treating the service as boot-resilient.
+
+The Colima boot script retries the T9 host mount while starting Docker. The
+backup script fails safely if T9 is absent instead of writing into an empty
+`/Volumes/T9` directory on the internal disk.
 
 ## Verification
 
