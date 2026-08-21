@@ -85,6 +85,18 @@ Read [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`AGENTS.md`](AGENTS.md) before ma
 
 WhatsApp is used for coordination and questions. `docs/GAME_ASSIGNMENTS.md` defines the work split, while branches and pull requests show active and completed code work. The team is not using GitHub Issues yet.
 
+## Production
+
+The public deployment runs on the Shimizu Technology Mac mini at
+`https://party-games.shimizu-technology.com`. Merges to `main` deploy
+automatically after the existing API, frontend, and deployment checks pass.
+GitHub-hosted Actions publish immutable ARM64 images; the mini pulls only the
+exact commit from the latest successful publish workflow.
+
+The production Compose stack, deployment scripts, backup procedure, launchd
+services, and recovery steps are documented in
+[`ops/mac-mini/README.md`](ops/mac-mini/README.md).
+
 ## AI rule
 
 > AI can help you code, debug, and understand the project, but you own the code. You must read it, run it, test it, and explain your pull request.

@@ -49,3 +49,14 @@ npm run build
 ```
 
 Cross-stack changes must run both sets.
+
+Deployment infrastructure changes must also run:
+
+```bash
+bash -n ops/mac-mini/*.sh
+docker compose --env-file env.production.example -f compose.production.yml config --quiet
+```
+
+Production resources are intentionally persistent and belong to Leon after a
+verified deployment. Do not stop the `party-games-hub` Compose project, its
+Cloudflare tunnel, or its launchd services during routine development cleanup.

@@ -1,0 +1,9 @@
+tunnel: 3a2606ff-2290-4441-994c-86d7f6fa0fef
+credentials-file: /Users/jerry/.cloudflared/3a2606ff-2290-4441-994c-86d7f6fa0fef.json
+
+ingress:
+  - hostname: party-games.shimizu-technology.com
+    service: http://127.0.0.1:8787
+    originRequest:
+      connectTimeout: 10s
+  - service: http_status:404

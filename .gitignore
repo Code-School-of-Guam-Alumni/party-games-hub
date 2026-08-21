@@ -7,6 +7,8 @@
 .env
 .env.*
 !.env.example
+.deployed-sha
+.deploy.lock/
 
 # Rails
 api/config/master.key
