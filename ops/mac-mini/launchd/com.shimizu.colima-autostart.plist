@@ -11,7 +11,7 @@
   <key>ProgramArguments</key>
   <array>
     <string>/bin/bash</string>
-    <string>/Users/jerry/.openclaw/scripts/colima-autostart.sh</string>
+    <string>/Users/jerry/services/party-games-hub/ops/mac-mini/party-games-colima-autostart.sh</string>
   </array>
   <key>EnvironmentVariables</key>
   <dict>
@@ -27,8 +27,8 @@
   <key>StartInterval</key>
   <integer>300</integer>
   <key>StandardOutPath</key>
-  <string>/opt/homebrew/var/log/colima-autostart-launchd.log</string>
+  <string>/Users/jerry/Library/Logs/party-games-colima-launchd.log</string>
   <key>StandardErrorPath</key>
-  <string>/opt/homebrew/var/log/colima-autostart-launchd.error.log</string>
+  <string>/Users/jerry/Library/Logs/party-games-colima-launchd.error.log</string>
 </dict>
 </plist>
