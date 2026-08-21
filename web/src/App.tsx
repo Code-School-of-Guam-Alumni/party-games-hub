@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import GuessTheNumberGame from './games/guess-the-number/GuessTheNumberGame'
 import ImposterGame from './games/imposter/ImposterGame'
 import './App.css'
 
@@ -74,6 +75,10 @@ function App() {
     return <ImposterGame onBack={() => setSelectedGame(null)} />
   }
 
+  if (selectedGame === 'guess-the-number') {
+    return <GuessTheNumberGame onBack={() => setSelectedGame(null)} />
+  }
+
   return (
     <main>
       <header className="hero">
@@ -98,7 +103,7 @@ function App() {
 
         <div className="game-grid">
           {games.map((game) => {
-            const hasSkeleton = game.slug === 'imposter'
+            const isAvailable = game.slug === 'imposter' || game.slug === 'guess-the-number'
 
             return (
               <article className="game-card" key={game.slug}>
@@ -109,12 +114,16 @@ function App() {
                 <h3>{game.name}</h3>
                 <p>{game.summary}</p>
                 <button
-                  className={hasSkeleton ? 'game-card-action' : undefined}
+                  className={isAvailable ? 'game-card-action' : undefined}
                   type="button"
-                  disabled={!hasSkeleton}
+                  disabled={!isAvailable}
                   onClick={() => setSelectedGame(game.slug)}
                 >
-                  {hasSkeleton ? 'Play Imposter' : 'Coming through a team PR'}
+                  {game.slug === 'imposter'
+                    ? 'Play Imposter'
+                    : isAvailable
+                      ? 'View game skeleton'
+                      : 'Coming through a team PR'}
                 </button>
               </article>
             )
