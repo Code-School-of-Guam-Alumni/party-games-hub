@@ -121,9 +121,11 @@ function App() {
                 >
                   {game.slug === 'imposter'
                     ? 'Play Imposter'
-                    : isAvailable
-                      ? 'View game skeleton'
-                      : 'Coming through a team PR'}
+                    : game.slug === 'guess-the-number'
+                      ? 'Play Guess the Number'
+                      : isAvailable
+                        ? 'View game skeleton'
+                        : 'Coming through a team PR'}
                 </button>
               </article>
             )

@@ -1,4 +1,16 @@
-import { useMemo, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
+import {
+  buildRoundBoard,
+  clamp,
+  heatLabel,
+  nextKeeperId,
+  parseGuess,
+  rangeMidpoint,
+  rankBestGuesses,
+  type Player,
+  type RangePreset,
+  type RoundGuess,
+} from './guessTheNumberGameLogic'
 import './GuessTheNumberGame.css'
 
 type GuessTheNumberGameProps = {
@@ -7,76 +19,14 @@ type GuessTheNumberGameProps = {
 
 type Phase = 'setup' | 'secret' | 'handoff' | 'guessing' | 'round-feedback' | 'reveal'
 
-type RangePreset = {
-  id: string
-  label: string
-  min: number
-  max: number
-  vibe: string
-  emoji: string
-  guessRounds: number
-}
+const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1'
 
-type Player = {
-  id: string
-  name: string
+const presetFlair: Record<string, string> = {
+  easy: '☕',
+  classic: '🎯',
+  chaos: '🌪️',
+  galaxy: '🌌',
 }
-
-type RoundGuess = {
-  playerId: string
-  name: string
-  guess: number
-  distance: number
-  round: number
-}
-
-type GuessResult = {
-  playerId: string
-  name: string
-  guess: number
-  distance: number
-  round: number
-  isWinner: boolean
-}
-
-const rangePresets: RangePreset[] = [
-  {
-    id: 'easy',
-    label: 'Easy',
-    min: 1,
-    max: 10,
-    vibe: '2 guesses each',
-    emoji: '☕',
-    guessRounds: 2,
-  },
-  {
-    id: 'classic',
-    label: 'Classic',
-    min: 1,
-    max: 100,
-    vibe: '5 guesses each',
-    emoji: '🎯',
-    guessRounds: 5,
-  },
-  {
-    id: 'chaos',
-    label: 'Chaos',
-    min: 1,
-    max: 1000,
-    vibe: '8 guesses each',
-    emoji: '🌪️',
-    guessRounds: 8,
-  },
-  {
-    id: 'galaxy',
-    label: 'Galaxy',
-    min: 0,
-    max: 4200,
-    vibe: '8 guesses each',
-    emoji: '🌌',
-    guessRounds: 8,
-  },
-]
 
 const flairLines = [
   'Drumroll, please…',
@@ -92,14 +42,6 @@ const exactWinLines = [
   '🏆 Exact match — instant win!',
 ]
 
-const hypeReactions = [
-  'Ice cold 🧊',
-  'Getting warmer 🌡️',
-  'Toasty 🔥',
-  'Scorching ☄️',
-  'Bullseye energy 🎯',
-]
-
 function createPlayers(): Player[] {
   return [
     { id: 'p1', name: 'Player 1' },
@@ -108,43 +50,16 @@ function createPlayers(): Player[] {
   ]
 }
 
-function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value))
-}
-
-function heatLabel(distance: number, span: number) {
-  const ratio = span === 0 ? 0 : distance / span
-  if (distance === 0) return hypeReactions[4]
-  if (ratio <= 0.05) return hypeReactions[3]
-  if (ratio <= 0.15) return hypeReactions[2]
-  if (ratio <= 0.35) return hypeReactions[1]
-  return hypeReactions[0]
-}
-
-function buildRoundBoard(
-  guessers: Player[],
-  roundGuesses: Record<string, number>,
-  secretNumber: number,
-  round: number,
-): RoundGuess[] {
-  return guessers
-    .filter((player) => roundGuesses[player.id] !== undefined)
-    .map((player) => {
-      const guess = roundGuesses[player.id]
-      return {
-        playerId: player.id,
-        name: player.name,
-        guess,
-        distance: Math.abs(guess - secretNumber),
-        round,
-      }
-    })
-    .sort((a, b) => a.distance - b.distance)
+function presetEmoji(slug: string) {
+  return presetFlair[slug] ?? '🎯'
 }
 
 function GuessTheNumberGame({ onBack }: GuessTheNumberGameProps) {
   const [phase, setPhase] = useState<Phase>('setup')
-  const [rangeId, setRangeId] = useState('classic')
+  const [presets, setPresets] = useState<RangePreset[]>([])
+  const [presetsStatus, setPresetsStatus] = useState<'loading' | 'ready' | 'error'>('loading')
+  const [presetsRequestId, setPresetsRequestId] = useState(0)
+  const [rangeSlug, setRangeSlug] = useState('')
   const [players, setPlayers] = useState<Player[]>(createPlayers)
   const [keeperId, setKeeperId] = useState('p1')
   const [secretDraft, setSecretDraft] = useState(50)
@@ -167,35 +82,46 @@ function GuessTheNumberGame({ onBack }: GuessTheNumberGameProps) {
     round: number
   } | null>(null)
 
-  const selectedRange = rangePresets.find((preset) => preset.id === rangeId) ?? rangePresets[1]
-  const totalRounds = selectedRange.guessRounds
+  useEffect(() => {
+    const controller = new AbortController()
+    setPresetsStatus('loading')
+
+    fetch(`${apiBaseUrl}/guess_the_number_presets`, { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error('Range preset request failed')
+        return response.json() as Promise<{ range_presets: RangePreset[] }>
+      })
+      .then(({ range_presets: rangePresets }) => {
+        setPresets(rangePresets)
+        setRangeSlug((current) => {
+          if (current && rangePresets.some((preset) => preset.slug === current)) return current
+          return rangePresets.find((preset) => preset.slug === 'classic')?.slug ?? rangePresets[0]?.slug ?? ''
+        })
+        setPresetsStatus('ready')
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === 'AbortError') return
+        setPresetsStatus('error')
+      })
+
+    return () => controller.abort()
+  }, [presetsRequestId])
+
+  const selectedRange = presets.find((preset) => preset.slug === rangeSlug) ?? presets[0]
+  const minNumber = selectedRange?.min_number ?? 1
+  const maxNumber = selectedRange?.max_number ?? 100
+  const totalRounds = selectedRange?.guess_rounds ?? 1
   const keeper = players.find((player) => player.id === keeperId) ?? players[0]
   const guessers = players.filter((player) => player.id !== keeperId)
   const activeGuesser = guessers[activeGuesserIndex]
-  const span = selectedRange.max - selectedRange.min
+  const span = maxNumber - minNumber
   const isFinalRound = currentRound >= totalRounds
+  const canStart = presetsStatus === 'ready' && Boolean(selectedRange)
 
-  const finalResults: GuessResult[] = useMemo(() => {
-    if (secretNumber === null || guessHistory.length === 0) return []
-
-    const bestByPlayer = new Map<string, GuessResult>()
-
-    for (const entry of guessHistory) {
-      const existing = bestByPlayer.get(entry.playerId)
-      if (!existing || entry.distance < existing.distance) {
-        bestByPlayer.set(entry.playerId, {
-          ...entry,
-          isWinner: false,
-        })
-      }
-    }
-
-    const ranked = [...bestByPlayer.values()].sort((a, b) => a.distance - b.distance)
-    if (ranked.length === 0) return ranked
-
-    const best = ranked[0].distance
-    return ranked.map((entry) => ({ ...entry, isWinner: entry.distance === best }))
-  }, [guessHistory, secretNumber])
+  const finalResults = useMemo(
+    () => (secretNumber === null || guessHistory.length === 0 ? [] : rankBestGuesses(guessHistory)),
+    [guessHistory, secretNumber],
+  )
 
   const winners = finalResults.filter((result) => result.isWinner)
 
@@ -232,7 +158,8 @@ function GuessTheNumberGame({ onBack }: GuessTheNumberGameProps) {
   }
 
   const startSecretPhase = () => {
-    const midpoint = Math.round((selectedRange.min + selectedRange.max) / 2)
+    if (!selectedRange) return
+    const midpoint = rangeMidpoint(minNumber, maxNumber)
     setSecretDraft(midpoint)
     clearPlayState()
     setPhase('secret')
@@ -257,14 +184,13 @@ function GuessTheNumberGame({ onBack }: GuessTheNumberGameProps) {
   }
 
   const nudgeSecret = (delta: number) => {
-    setSecretDraft((current) => clamp(current + delta, selectedRange.min, selectedRange.max))
+    setSecretDraft((current) => clamp(current + delta, minNumber, maxNumber))
     setPulseDial(true)
     window.setTimeout(() => setPulseDial(false), 220)
   }
 
   const randomizeSecret = () => {
-    const next =
-      Math.floor(Math.random() * (selectedRange.max - selectedRange.min + 1)) + selectedRange.min
+    const next = Math.floor(Math.random() * (maxNumber - minNumber + 1)) + minNumber
     setSecretDraft(next)
     setPulseDial(true)
     window.setTimeout(() => setPulseDial(false), 350)
@@ -327,14 +253,8 @@ function GuessTheNumberGame({ onBack }: GuessTheNumberGameProps) {
   const submitGuess = () => {
     if (!activeGuesser || secretNumber === null) return
 
-    const parsed = Number(guessDraft)
-    if (!Number.isFinite(parsed) || !Number.isInteger(parsed)) {
-      setShakeHint(true)
-      window.setTimeout(() => setShakeHint(false), 400)
-      return
-    }
-
-    if (parsed < selectedRange.min || parsed > selectedRange.max) {
+    const parsed = parseGuess(guessDraft, minNumber, maxNumber)
+    if (parsed === null) {
       setShakeHint(true)
       window.setTimeout(() => setShakeHint(false), 400)
       return
@@ -359,9 +279,7 @@ function GuessTheNumberGame({ onBack }: GuessTheNumberGameProps) {
   }
 
   const rotateKeeperAndReplay = () => {
-    const currentIndex = players.findIndex((player) => player.id === keeperId)
-    const nextKeeper = players[(currentIndex + 1) % players.length]
-    setKeeperId(nextKeeper.id)
+    setKeeperId(nextKeeperId(players, keeperId))
     clearPlayState()
     setPhase('setup')
   }
@@ -372,7 +290,7 @@ function GuessTheNumberGame({ onBack }: GuessTheNumberGameProps) {
   }
 
   const dialPercent =
-    ((secretDraft - selectedRange.min) / Math.max(1, selectedRange.max - selectedRange.min)) * 100
+    ((secretDraft - minNumber) / Math.max(1, maxNumber - minNumber)) * 100
 
   return (
     <main className="gtn-page">
@@ -383,7 +301,7 @@ function GuessTheNumberGame({ onBack }: GuessTheNumberGameProps) {
           </svg>
           Back to game library
         </button>
-        <span className="gtn-stage">Interactive skeleton · local playtest</span>
+        <span className="gtn-stage">Playable loop · Rails presets</span>
       </nav>
 
       <header className="gtn-hero">
@@ -400,10 +318,11 @@ function GuessTheNumberGame({ onBack }: GuessTheNumberGameProps) {
           <div className="gtn-facts" aria-label="Game details">
             <span>{players.length} players</span>
             <span>
-              {selectedRange.min}–{selectedRange.max}
+              {minNumber}–{maxNumber}
             </span>
             <span>
-              {selectedRange.emoji} {selectedRange.label} · {totalRounds} guesses
+              {presetEmoji(selectedRange?.slug ?? 'classic')} {selectedRange?.name ?? 'Loading'} ·{' '}
+              {totalRounds} guesses
             </span>
           </div>
         </div>
@@ -449,29 +368,49 @@ function GuessTheNumberGame({ onBack }: GuessTheNumberGameProps) {
               <p className="gtn-field-title" id="gtn-range-label">
                 Difficulty &amp; range
               </p>
+              {presetsStatus === 'loading' && <p className="gtn-status">Loading range presets…</p>}
+              {presetsStatus === 'error' && (
+                <div className="gtn-recovery" role="alert">
+                  <p className="gtn-error">Could not reach the Rails range-preset API.</p>
+                  <button
+                    className="gtn-secondary"
+                    type="button"
+                    onClick={() => setPresetsRequestId((id) => id + 1)}
+                  >
+                    Try again
+                  </button>
+                </div>
+              )}
+              {presetsStatus === 'ready' && presets.length === 0 && (
+                <p className="gtn-error" role="alert">
+                  No active range presets are available yet.
+                </p>
+              )}
               <div className="gtn-range-grid" role="group" aria-labelledby="gtn-range-label">
-                {rangePresets.map((preset) => (
+                {presets.map((preset) => (
                   <button
                     key={preset.id}
                     className={
-                      rangeId === preset.id ? 'gtn-range-card is-selected' : 'gtn-range-card'
+                      rangeSlug === preset.slug ? 'gtn-range-card is-selected' : 'gtn-range-card'
                     }
                     type="button"
-                    onClick={() => setRangeId(preset.id)}
+                    disabled={presetsStatus !== 'ready'}
+                    onClick={() => setRangeSlug(preset.slug)}
                   >
                     <span>
-                      {preset.emoji} {preset.label}
+                      {presetEmoji(preset.slug)} {preset.name}
                     </span>
                     <strong>
-                      {preset.min}–{preset.max}
+                      {preset.min_number}–{preset.max_number}
                     </strong>
-                    <em>{preset.guessRounds} guesses each</em>
+                    <em>{preset.guess_rounds} guesses each</em>
                   </button>
                 ))}
               </div>
               <p className="gtn-helper-text">
-                Selected mode: each guesser gets <strong>{totalRounds}</strong> attempts. Hot/cold
-                updates after every full round—secret stays hidden until the last one.
+                {selectedRange
+                  ? selectedRange.instructions
+                  : 'Choose a Rails-backed range to start a round.'}
               </p>
             </div>
 
@@ -526,7 +465,12 @@ function GuessTheNumberGame({ onBack }: GuessTheNumberGameProps) {
               </button>
             </div>
 
-            <button className="gtn-start" type="button" onClick={startSecretPhase}>
+            <button
+              className="gtn-start"
+              type="button"
+              onClick={startSecretPhase}
+              disabled={!canStart}
+            >
               Pass phone to {keeper.name} →
             </button>
           </section>
@@ -535,12 +479,12 @@ function GuessTheNumberGame({ onBack }: GuessTheNumberGameProps) {
             <div className="gtn-playground">
               <p className="gtn-label">Guess economy</p>
               <ul className="gtn-guess-economy">
-                {rangePresets.map((preset) => (
-                  <li key={preset.id} className={rangeId === preset.id ? 'is-active' : undefined}>
+                {presets.map((preset) => (
+                  <li key={preset.id} className={rangeSlug === preset.slug ? 'is-active' : undefined}>
                     <strong>
-                      {preset.emoji} {preset.label}
+                      {presetEmoji(preset.slug)} {preset.name}
                     </strong>
-                    <span>{preset.guessRounds} rounds of guessing</span>
+                    <span>{preset.guess_rounds} rounds of guessing</span>
                   </li>
                 ))}
               </ul>
@@ -576,7 +520,7 @@ function GuessTheNumberGame({ onBack }: GuessTheNumberGameProps) {
                 <strong>{peeking ? secretDraft : '•••'}</strong>
               </div>
               <p>
-                Range {selectedRange.min}–{selectedRange.max}
+                Range {minNumber}–{maxNumber}
               </p>
             </div>
 
@@ -585,8 +529,8 @@ function GuessTheNumberGame({ onBack }: GuessTheNumberGameProps) {
               <input
                 id="secret-slider"
                 type="range"
-                min={selectedRange.min}
-                max={selectedRange.max}
+                min={minNumber}
+                max={maxNumber}
                 value={secretDraft}
                 onChange={(event) => setSecretDraft(Number(event.target.value))}
               />
@@ -662,7 +606,7 @@ function GuessTheNumberGame({ onBack }: GuessTheNumberGameProps) {
               <h2 id="guess-heading">{activeGuesser.name}, take your shot</h2>
             </div>
             <span className="gtn-coming-soon">
-              {selectedRange.min}–{selectedRange.max}
+              {minNumber}–{maxNumber}
             </span>
           </div>
 
@@ -689,8 +633,8 @@ function GuessTheNumberGame({ onBack }: GuessTheNumberGameProps) {
               id="guess-input"
               type="number"
               inputMode="numeric"
-              min={selectedRange.min}
-              max={selectedRange.max}
+              min={minNumber}
+              max={maxNumber}
               value={guessDraft}
               placeholder="Type a gut feeling"
               onChange={(event) => setGuessDraft(event.target.value)}
@@ -701,7 +645,7 @@ function GuessTheNumberGame({ onBack }: GuessTheNumberGameProps) {
             <div className="gtn-quick-picks" aria-label="Quick picks">
               {[0.2, 0.5, 0.8].map((ratio) => {
                 const value = Math.round(
-                  selectedRange.min + (selectedRange.max - selectedRange.min) * ratio,
+                  minNumber + (maxNumber - minNumber) * ratio,
                 )
                 return (
                   <button key={ratio} type="button" onClick={() => setGuessDraft(String(value))}>
@@ -897,7 +841,13 @@ function GuessTheNumberGame({ onBack }: GuessTheNumberGameProps) {
           <li>
             <span className="gtn-step-number">01</span>
             <h3>Pick difficulty</h3>
-            <p>Easy = 2 guesses, Classic/Galaxy = 8, Chaos = 5.</p>
+            <p>
+              {presets.length > 0
+                ? presets
+                    .map((preset) => `${preset.name} = ${preset.guess_rounds} guesses`)
+                    .join(', ')
+                : 'Each Rails preset sets the range and how many guesses each hunter gets.'}
+            </p>
           </li>
           <li>
             <span className="gtn-step-number">02</span>
@@ -929,7 +879,7 @@ function GuessTheNumberGame({ onBack }: GuessTheNumberGameProps) {
       </section>
 
       <footer className="gtn-footer">
-        <p>Local interactive demo for PR 1. Rails range presets come in PR 2.</p>
+        <p>Playable round using Rails range presets. Closest guess wins; ties stay ties.</p>
         <button type="button" onClick={onBack}>
           Return to all games
         </button>
