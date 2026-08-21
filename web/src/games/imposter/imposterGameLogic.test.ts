@@ -43,6 +43,14 @@ describe('createRound', () => {
     expect(() => createRound(['Ada', 'Bo', 'Cy'], pack)).toThrow('4–8 players')
     expect(() => createRound(['Ada', 'ada', 'Cy', 'Dee'], pack)).toThrow('unique')
   })
+
+  it('avoids immediately repeating the word and Imposter when replaying', () => {
+    const firstRound = createRound(['Ada', 'Bo', 'Cy', 'Dee'], pack, queuedRandom(0, 0, 0))
+    const replay = createRound(['Ada', 'Bo', 'Cy', 'Dee'], pack, queuedRandom(0, 0, 0), firstRound)
+
+    expect(replay.imposterId).not.toBe(firstRound.imposterId)
+    expect(replay.secretWord).not.toBe(firstRound.secretWord)
+  })
 })
 
 describe('voting and outcomes', () => {

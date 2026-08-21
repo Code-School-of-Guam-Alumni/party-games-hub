@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   activePlayers,
   createRound,
@@ -31,6 +31,18 @@ type Winner = 'regulars' | 'imposter'
 
 const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1'
 const initialPlayers = ['Player 1', 'Player 2', 'Player 3', 'Player 4']
+const phaseLabels: Record<Phase, string> = {
+  setup: 'Final polish',
+  handoff: 'Private handoff',
+  reveal: 'Private role',
+  clues: 'Clue round',
+  vote: 'Group vote',
+  'tie-clue': 'Extra clues',
+  'tie-vote': 'Tie-breaker vote',
+  'vote-result': 'Vote result',
+  'final-guess': 'Final guess',
+  'round-end': 'Round complete',
+}
 
 function nameFor(round: ImposterRound, playerId: string) {
   return round.players.find((player) => player.id === playerId)?.name ?? 'Unknown player'
@@ -39,6 +51,7 @@ function nameFor(round: ImposterRound, playerId: string) {
 function ImposterGame({ onBack }: ImposterGameProps) {
   const [packs, setPacks] = useState<WordPack[]>([])
   const [packsStatus, setPacksStatus] = useState<'loading' | 'ready' | 'error'>('loading')
+  const [packsRequestId, setPacksRequestId] = useState(0)
   const [selectedPackSlug, setSelectedPackSlug] = useState('')
   const [playerNames, setPlayerNames] = useState(initialPlayers)
   const [setupError, setSetupError] = useState('')
@@ -52,9 +65,13 @@ function ImposterGame({ onBack }: ImposterGameProps) {
   const [roundNotice, setRoundNotice] = useState('')
   const [finalGuess, setFinalGuess] = useState('')
   const [winner, setWinner] = useState<Winner | null>(null)
+  const [resultReason, setResultReason] = useState('')
+  const [showEndConfirm, setShowEndConfirm] = useState(false)
+  const endRoundButtonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     const controller = new AbortController()
+    setPacksStatus('loading')
 
     fetch(`${apiBaseUrl}/imposter_word_packs`, { signal: controller.signal })
       .then((response) => {
@@ -72,7 +89,26 @@ function ImposterGame({ onBack }: ImposterGameProps) {
       })
 
     return () => controller.abort()
-  }, [])
+  }, [packsRequestId])
+
+  useEffect(() => {
+    if (phase === 'setup') return
+
+    window.requestAnimationFrame(() => {
+      document.querySelector<HTMLHeadingElement>('.imposter-game-card h1')?.focus()
+    })
+  }, [phase])
+
+  useEffect(() => {
+    if (!showEndConfirm) return
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') closeEndConfirm()
+    }
+
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [showEndConfirm])
 
   const currentRevealPlayer = round?.players[revealIndex]
   const livingPlayers = useMemo(() => round ? activePlayers(round) : [], [round])
@@ -99,7 +135,7 @@ function ImposterGame({ onBack }: ImposterGameProps) {
     }
 
     try {
-      const nextRound = createRound(playerNames, selectedPack)
+      const nextRound = createRound(playerNames, selectedPack, Math.random, round ?? undefined)
       setRound(nextRound)
       setRevealIndex(0)
       setVotes({})
@@ -107,6 +143,7 @@ function ImposterGame({ onBack }: ImposterGameProps) {
       setAccusedId('')
       setRoundNotice('')
       setWinner(null)
+      setResultReason('')
       setFinalGuess('')
       setSetupError('')
       setPhase('handoff')
@@ -174,6 +211,7 @@ function ImposterGame({ onBack }: ImposterGameProps) {
     setRound(updatedRound)
     if (imposterHasSurvivedToFinalTwo(updatedRound)) {
       setWinner('imposter')
+      setResultReason('Only one regular player remained active.')
       setPhase('round-end')
     } else {
       setPhase('vote-result')
@@ -182,7 +220,11 @@ function ImposterGame({ onBack }: ImposterGameProps) {
 
   function submitFinalGuess() {
     if (!round || !finalGuess.trim()) return
-    setWinner(guessesMatch(finalGuess, round.secretWord) ? 'imposter' : 'regulars')
+    const correctGuess = guessesMatch(finalGuess, round.secretWord)
+    setWinner(correctGuess ? 'imposter' : 'regulars')
+    setResultReason(correctGuess
+      ? 'The caught Imposter guessed the secret word.'
+      : 'The caught Imposter missed the final guess.')
     setPhase('round-end')
   }
 
@@ -190,6 +232,12 @@ function ImposterGame({ onBack }: ImposterGameProps) {
     setRound(null)
     setPhase('setup')
     setSetupError('')
+    setShowEndConfirm(false)
+  }
+
+  function closeEndConfirm() {
+    setShowEndConfirm(false)
+    window.requestAnimationFrame(() => endRoundButtonRef.current?.focus())
   }
 
   function renderSetup() {
@@ -215,14 +263,17 @@ function ImposterGame({ onBack }: ImposterGameProps) {
               <p className="imposter-label">Round setup</p>
               <h2 id="imposter-setup-heading">Bring the group together</h2>
             </div>
-            <span className="imposter-coming-soon">PR 3 · Playable loop</span>
+            <span className="imposter-coming-soon">Ready for playtest</span>
           </div>
 
           <div className="imposter-field">
             <label htmlFor="imposter-pack">Word pack</label>
             {packsStatus === 'loading' && <p className="imposter-status">Loading word packs…</p>}
             {packsStatus === 'error' && (
-              <p className="imposter-error" role="alert">Could not reach the Rails word-pack API. Start it and reload.</p>
+              <div className="imposter-recovery" role="alert">
+                <p className="imposter-error">Could not reach the Rails word-pack API.</p>
+                <button className="imposter-secondary" type="button" onClick={() => setPacksRequestId((id) => id + 1)}>Try again</button>
+              </div>
             )}
             {packsStatus === 'ready' && packs.length === 0 && (
               <p className="imposter-error" role="alert">No active word packs are available yet.</p>
@@ -262,6 +313,16 @@ function ImposterGame({ onBack }: ImposterGameProps) {
 
           {setupError && <p className="imposter-error" role="alert">{setupError}</p>}
           <button className="imposter-start" type="button" onClick={beginRound} disabled={!selectedPack}>Start private reveals</button>
+
+          <details className="imposter-rules">
+            <summary>Quick rules and win conditions</summary>
+            <ol>
+              <li>Privately reveal one shared word and one Imposter hint.</li>
+              <li>Give one spoken clue each, discuss, and record every vote.</li>
+              <li>A tied group gets extra clues and one revote; a second tie eliminates nobody.</li>
+              <li>Catch the Imposter and survive their final guess, or the Imposter wins with one regular left.</li>
+            </ol>
+          </details>
         </section>
       </>
     )
@@ -273,7 +334,7 @@ function ImposterGame({ onBack }: ImposterGameProps) {
     return (
       <section className="imposter-game-card" aria-labelledby="vote-heading">
         <p className="imposter-label">{phase === 'tie-vote' ? 'Tie-breaker vote' : 'Group vote'}</p>
-        <h1 id="vote-heading">Record every vote.</h1>
+        <h1 id="vote-heading" tabIndex={-1}>Record every vote.</h1>
         <p>Vote aloud, then choose each active player’s selection below.</p>
         <div className="imposter-ballots">
           {livingPlayers.map((voter) => (
@@ -303,7 +364,7 @@ function ImposterGame({ onBack }: ImposterGameProps) {
       return (
         <section className="imposter-game-card imposter-private-card">
           <p className="imposter-label">Role {revealIndex + 1} of {round.players.length}</p>
-          <h1>Pass to {currentRevealPlayer.name}.</h1>
+          <h1 tabIndex={-1}>Pass to {currentRevealPlayer.name}.</h1>
           <p>Keep the screen hidden until they confirm they have the phone.</p>
           <button className="imposter-primary" type="button" onClick={() => setPhase('reveal')}>I have the phone</button>
         </section>
@@ -315,7 +376,7 @@ function ImposterGame({ onBack }: ImposterGameProps) {
       return (
         <section className={`imposter-game-card imposter-reveal-card ${isImposter ? 'is-imposter' : ''}`}>
           <p className="imposter-label">For {currentRevealPlayer.name} only</p>
-          <h1>{isImposter ? 'You are the Imposter.' : round.secretWord}</h1>
+          <h1 tabIndex={-1}>{isImposter ? 'You are the Imposter.' : round.secretWord}</h1>
           <p>{isImposter ? `Your hint is “${round.hint}.” Bluff carefully.` : 'This is the secret word. Give one clue without saying it.'}</p>
           <button className="imposter-primary" type="button" onClick={finishReveal}>Hide role and pass</button>
         </section>
@@ -326,7 +387,7 @@ function ImposterGame({ onBack }: ImposterGameProps) {
       return (
         <section className="imposter-game-card">
           <p className="imposter-label">Clue round · {livingPlayers.length} active</p>
-          <h1>{nameFor(round, round.startingPlayerId)} starts.</h1>
+          <h1 tabIndex={-1}>{nameFor(round, round.startingPlayerId)} starts.</h1>
           <p>{roundNotice || 'Go around once. Each active player says exactly one clue, then discuss who might be bluffing.'}</p>
           <ul className="imposter-active-list" aria-label="Active players">
             {livingPlayers.map((player) => <li key={player.id}>{player.name}</li>)}
@@ -343,7 +404,7 @@ function ImposterGame({ onBack }: ImposterGameProps) {
       return (
         <section className="imposter-game-card">
           <p className="imposter-label">The vote is tied</p>
-          <h1>One extra clue each.</h1>
+          <h1 tabIndex={-1}>One extra clue each.</h1>
           <p>{tiedCandidateIds.map((id) => nameFor(round, id)).join(' and ')} each give one more clue. Then everyone votes between only those players.</p>
           <button className="imposter-primary" type="button" onClick={() => openVote('tie-vote')}>Start tie-breaker vote</button>
         </section>
@@ -354,7 +415,7 @@ function ImposterGame({ onBack }: ImposterGameProps) {
       return (
         <section className="imposter-game-card">
           <p className="imposter-label">Regular player eliminated</p>
-          <h1>{accusedName} knew the word.</h1>
+          <h1 tabIndex={-1}>{accusedName} knew the word.</h1>
           <p>The Imposter is still active. The remaining players begin another clue round.</p>
           <button className="imposter-primary" type="button" onClick={() => setPhase('clues')}>Continue the round</button>
         </section>
@@ -365,13 +426,15 @@ function ImposterGame({ onBack }: ImposterGameProps) {
       return (
         <section className="imposter-game-card">
           <p className="imposter-label">Imposter caught</p>
-          <h1>{accusedName}, make one final guess.</h1>
+          <h1 tabIndex={-1}>{accusedName}, make one final guess.</h1>
           <p>A correct secret word steals the win.</p>
-          <label className="imposter-guess">
-            <span>Your final guess</span>
-            <input value={finalGuess} onChange={(event) => setFinalGuess(event.target.value)} autoComplete="off" />
-          </label>
-          <button className="imposter-primary" type="button" onClick={submitFinalGuess} disabled={!finalGuess.trim()}>Lock in guess</button>
+          <form className="imposter-guess-form" onSubmit={(event) => { event.preventDefault(); submitFinalGuess() }}>
+            <label className="imposter-guess">
+              <span>Your final guess</span>
+              <input value={finalGuess} onChange={(event) => setFinalGuess(event.target.value)} autoComplete="off" />
+            </label>
+            <button className="imposter-primary" type="submit" disabled={!finalGuess.trim()}>Lock in guess</button>
+          </form>
         </section>
       )
     }
@@ -380,7 +443,8 @@ function ImposterGame({ onBack }: ImposterGameProps) {
       return (
         <section className="imposter-game-card imposter-result-card">
           <p className="imposter-label">Round complete</p>
-          <h1>{winner === 'imposter' ? 'The Imposter wins.' : 'The regulars win.'}</h1>
+          <h1 tabIndex={-1}>{winner === 'imposter' ? 'The Imposter wins.' : 'The regulars win.'}</h1>
+          <p>{resultReason}</p>
           <dl>
             <div><dt>Imposter</dt><dd>{imposter?.name}</dd></div>
             <div><dt>Secret word</dt><dd>{round.secretWord}</dd></div>
@@ -399,14 +463,28 @@ function ImposterGame({ onBack }: ImposterGameProps) {
 
   return (
     <main className={`imposter-page ${phase === 'setup' ? '' : 'imposter-page-playing'}`}>
+      <p className="sr-only" aria-live="polite">{phase === 'setup' ? '' : phaseLabels[phase]}</p>
       <nav className="imposter-nav" aria-label="Imposter game navigation">
-        <button className="imposter-back" type="button" onClick={phase === 'setup' ? onBack : returnToSetup}>
+        <button ref={endRoundButtonRef} className="imposter-back" type="button" onClick={phase === 'setup' ? onBack : () => setShowEndConfirm(true)}>
           <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m12.5 4-6 6 6 6" /></svg>
           {phase === 'setup' ? 'Back to game library' : 'End round'}
         </button>
-        <span className="imposter-stage">PR 3 · Playable game</span>
+        <span className="imposter-stage">PR 4 · {phaseLabels[phase]}</span>
       </nav>
       {phase === 'setup' ? renderSetup() : <div className="imposter-game-stage">{renderRound()}</div>}
+      {showEndConfirm && (
+        <div className="imposter-modal-backdrop">
+          <section className="imposter-modal" role="dialog" aria-modal="true" aria-labelledby="end-round-heading">
+            <p className="imposter-label">Round in progress</p>
+            <h2 id="end-round-heading">End this round?</h2>
+            <p>Private roles and the current vote will be cleared.</p>
+            <div className="imposter-actions">
+              <button className="imposter-primary" type="button" onClick={returnToSetup}>End round</button>
+              <button className="imposter-secondary" type="button" autoFocus onClick={closeEndConfirm}>Keep playing</button>
+            </div>
+          </section>
+        </div>
+      )}
     </main>
   )
 }
