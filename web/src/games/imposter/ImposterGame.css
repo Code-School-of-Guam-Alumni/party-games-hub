@@ -533,6 +533,345 @@
   font-weight: 800;
 }
 
+.imposter-hero-compact {
+  min-height: 470px;
+  grid-template-columns: minmax(0, 820px);
+  padding: 4rem 0;
+}
+
+.imposter-live-setup {
+  max-width: 820px;
+  margin: 4rem auto;
+}
+
+.imposter-live-setup .imposter-field {
+  margin-bottom: 1.5rem;
+}
+
+.imposter-live-setup select,
+.imposter-ballots select,
+.imposter-guess input {
+  width: 100%;
+  min-height: 50px;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--imposter-line);
+  border-radius: 0.7rem;
+  color: var(--imposter-ink);
+  background: var(--imposter-surface-raised);
+}
+
+.imposter-player-fieldset {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.imposter-player-fieldset legend {
+  margin-bottom: 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.imposter-player-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.45rem;
+}
+
+.imposter-player-row button {
+  min-height: 48px;
+  padding: 0 0.8rem;
+  border: 1px solid rgba(255, 118, 95, 0.45);
+  border-radius: 0.7rem;
+  color: var(--imposter-coral);
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.imposter-start,
+.imposter-primary,
+.imposter-secondary {
+  min-height: 52px;
+  padding: 0.8rem 1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.imposter-start,
+.imposter-primary {
+  border: 0;
+  color: #161a12;
+  background: var(--imposter-acid);
+}
+
+.imposter-start {
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
+.imposter-start:disabled,
+.imposter-primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.imposter-secondary {
+  width: fit-content;
+  border: 1px solid var(--imposter-line);
+  color: var(--imposter-ink);
+  background: transparent;
+}
+
+.imposter-start:focus-visible,
+.imposter-primary:focus-visible,
+.imposter-secondary:focus-visible,
+.imposter-player-row button:focus-visible,
+.imposter-live-setup input:focus-visible,
+.imposter-live-setup select:focus-visible,
+.imposter-ballots select:focus-visible,
+.imposter-guess input:focus-visible {
+  outline: 3px solid var(--imposter-coral);
+  outline-offset: 3px;
+}
+
+.imposter-status,
+.imposter-error {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.imposter-status {
+  color: var(--imposter-muted);
+}
+
+.imposter-error {
+  color: #ff9b8a;
+  font-weight: 700;
+}
+
+.imposter-recovery {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.imposter-recovery .imposter-secondary {
+  min-height: 44px;
+  flex: 0 0 auto;
+}
+
+.imposter-rules {
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--imposter-line);
+  color: var(--imposter-muted);
+}
+
+.imposter-rules summary {
+  min-height: 48px;
+  padding-top: 1rem;
+  color: var(--imposter-ink);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.imposter-rules ol {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+  line-height: 1.55;
+}
+
+.imposter-page-playing {
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.imposter-game-stage {
+  display: grid;
+  min-height: calc(100vh - 77px);
+  place-items: center;
+  padding: 3rem 0;
+}
+
+.imposter-game-card {
+  width: min(720px, 100%);
+  padding: clamp(1.5rem, 6vw, 3.5rem);
+  border: 1px solid var(--imposter-line);
+  border-radius: 1.5rem;
+  background:
+    linear-gradient(145deg, rgba(216, 255, 99, 0.07), transparent 48%),
+    rgba(23, 26, 24, 0.94);
+  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.24);
+}
+
+.imposter-game-card h1 {
+  max-width: 680px;
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(2.8rem, 8vw, 5.4rem);
+  font-weight: 500;
+  line-height: 0.96;
+  letter-spacing: -0.055em;
+}
+
+.imposter-game-card h1:focus {
+  outline: none;
+}
+
+.imposter-game-card > p:not(.imposter-label):not(.imposter-error) {
+  margin: 1.25rem 0 0;
+  color: #c8ccc2;
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+
+.imposter-game-card > .imposter-primary,
+.imposter-guess-form > .imposter-primary {
+  width: 100%;
+  margin-top: 2rem;
+}
+
+.imposter-private-card {
+  text-align: center;
+}
+
+.imposter-reveal-card {
+  border-color: rgba(216, 255, 99, 0.42);
+}
+
+.imposter-reveal-card.is-imposter {
+  border-color: rgba(255, 118, 95, 0.5);
+  background:
+    linear-gradient(145deg, rgba(255, 118, 95, 0.12), transparent 58%),
+    rgba(23, 26, 24, 0.96);
+}
+
+.imposter-reveal-card.is-imposter h1 {
+  color: var(--imposter-coral);
+  font-style: italic;
+}
+
+.imposter-active-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.imposter-active-list li {
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--imposter-line);
+  border-radius: 999px;
+  color: #c8ccc2;
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.imposter-ballots {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.imposter-ballots label,
+.imposter-guess {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.imposter-ballots span,
+.imposter-guess span {
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.imposter-guess {
+  margin-top: 2rem;
+}
+
+.imposter-guess-form {
+  margin: 0;
+}
+
+.imposter-result-card dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 2rem 0 0;
+}
+
+.imposter-result-card dl div {
+  padding: 1rem;
+  border: 1px solid var(--imposter-line);
+  border-radius: 0.85rem;
+}
+
+.imposter-result-card dt {
+  color: var(--imposter-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.imposter-result-card dd {
+  margin: 0.55rem 0 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.imposter-actions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.imposter-modal-backdrop {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(4, 6, 4, 0.82);
+  backdrop-filter: blur(8px);
+}
+
+.imposter-modal {
+  width: min(500px, 100%);
+  padding: clamp(1.5rem, 5vw, 2.5rem);
+  border: 1px solid rgba(255, 118, 95, 0.42);
+  border-radius: 1.25rem;
+  background: var(--imposter-surface);
+  box-shadow: 0 2rem 6rem rgba(0, 0, 0, 0.5);
+}
+
+.imposter-modal h2 {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(2.25rem, 7vw, 3.75rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+}
+
+.imposter-modal > p:not(.imposter-label) {
+  margin: 1rem 0 0;
+  color: var(--imposter-muted);
+  line-height: 1.6;
+}
+
 @media (max-width: 900px) {
   .imposter-hero {
     min-height: auto;
@@ -628,6 +967,29 @@
     flex-direction: column;
     gap: 1rem;
     margin-top: 4rem;
+  }
+
+  .imposter-live-setup {
+    margin: 2.5rem auto;
+  }
+
+  .imposter-ballots,
+  .imposter-result-card dl,
+  .imposter-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .imposter-actions .imposter-secondary {
+    width: 100%;
+  }
+
+  .imposter-game-stage {
+    align-items: start;
+    padding: 1.5rem 0 2.5rem;
+  }
+
+  .imposter-game-card {
+    border-radius: 1.1rem;
   }
 }
 

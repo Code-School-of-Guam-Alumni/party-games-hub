@@ -2,7 +2,7 @@
 
 A mobile-first web collection of pass-the-device party games built by the Code School of Guam alumni internship team.
 
-**Status:** Project foundation and game-skeleton milestone
+**Status:** Project foundation plus a stacked, playable Imposter reference implementation
 
 ## Team
 
@@ -23,6 +23,10 @@ Planned games and owners:
 4. **Imposter** — Leon
 
 See [`docs/GAME_ASSIGNMENTS.md`](docs/GAME_ASSIGNMENTS.md), [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md), and [`docs/GAME_RULES.md`](docs/GAME_RULES.md).
+
+Leon's four-branch Imposter build is documented as a teaching example in
+[`docs/STACKED_PR_DEMO.md`](docs/STACKED_PR_DEMO.md). The other games remain at
+their assigned milestones.
 
 ## Stack
 

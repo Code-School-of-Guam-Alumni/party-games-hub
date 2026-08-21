@@ -273,6 +273,10 @@ Branch: `leon-imposter-polish`
 - Optional discussion timer if playtesting shows it is needed
 - Avoid immediate word or Imposter repetition where practical
 
+Implementation note: automated rules, desktop Chrome, and a 375px responsive
+viewport are covered in the stack. A real group and physical-phone privacy test
+remain human sign-off items; they are not replaced by browser emulation.
+
 ## Playtest questions
 
 The first real group test should answer:
