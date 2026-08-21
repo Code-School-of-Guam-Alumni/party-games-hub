@@ -35,12 +35,17 @@ The first implementation may be single-player or pass-the-device and does not re
 
 ## Imposter
 
-1. Choose a word set and player count.
+1. Enter 4–8 player names and choose a word pack.
 2. Most players privately see the same secret word.
-3. One player sees only a related hint and is the imposter.
-4. Pass the device so each player can reveal and hide their role privately.
-5. Players take turns giving one related clue.
-6. Players vote for the suspected imposter.
-7. If the imposter is not found, play another clue round.
+3. One player sees only a related hint and is the Imposter.
+4. Pass the device so each player can explicitly reveal and hide their role in private.
+5. Active players take turns giving exactly one spoken clue related to the secret word.
+6. After discussion, the group votes in person and records one accused player in the app.
+7. A tied group gives the tied players one additional clue and votes again. If the second vote is also tied, nobody is eliminated and all active players begin another clue round.
+8. An accused regular player is eliminated, and the remaining players begin another clue round.
+9. An accused Imposter gets one final guess at the secret word. A correct guess gives the Imposter the win; otherwise, the regular players win.
+10. The Imposter also wins if only one regular player remains.
 
-The app must prevent the next player from seeing the previous player's private role during handoff.
+The app must remove the previous player's private role from view before showing the next handoff screen. Eliminated players may watch, but they no longer give clues, discuss, or vote.
+
+See [`IMPOSTER_GAME_PLAN.md`](IMPOSTER_GAME_PLAN.md) for the research, rationale, implementation plan, and playtest questions behind these rules.

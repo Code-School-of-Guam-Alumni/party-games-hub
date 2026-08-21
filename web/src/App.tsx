@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import GuessTheNumberGame from './games/guess-the-number/GuessTheNumberGame'
+import ImposterGame from './games/imposter/ImposterGame'
 import './App.css'
 
 type Game = {
@@ -68,8 +69,12 @@ function App() {
     return () => controller.abort()
   }, [])
 
-  // PR 1 uses a small view switch so the skeleton stays dependency-free.
+  // A small view switch keeps each intern game dependency-free.
   // Shared routing can replace this when more game pages are ready.
+  if (selectedGame === 'imposter') {
+    return <ImposterGame onBack={() => setSelectedGame(null)} />
+  }
+
   if (selectedGame === 'guess-the-number') {
     return <GuessTheNumberGame onBack={() => setSelectedGame(null)} />
   }
@@ -98,7 +103,7 @@ function App() {
 
         <div className="game-grid">
           {games.map((game) => {
-            const hasSkeleton = game.slug === 'guess-the-number'
+            const isAvailable = game.slug === 'imposter' || game.slug === 'guess-the-number'
 
             return (
               <article className="game-card" key={game.slug}>
@@ -109,12 +114,16 @@ function App() {
                 <h3>{game.name}</h3>
                 <p>{game.summary}</p>
                 <button
-                  className={hasSkeleton ? 'game-card-action' : undefined}
+                  className={isAvailable ? 'game-card-action' : undefined}
                   type="button"
-                  disabled={!hasSkeleton}
+                  disabled={!isAvailable}
                   onClick={() => setSelectedGame(game.slug)}
                 >
-                  {hasSkeleton ? 'View game skeleton' : 'Coming through a team PR'}
+                  {game.slug === 'imposter'
+                    ? 'Play Imposter'
+                    : isAvailable
+                      ? 'View game skeleton'
+                      : 'Coming through a team PR'}
                 </button>
               </article>
             )
