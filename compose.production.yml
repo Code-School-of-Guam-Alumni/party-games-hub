@@ -1,0 +1,112 @@
+name: party-games-hub
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: 10m
+    max-file: "3"
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - backend
+    mem_limit: 512m
+    cpus: 0.5
+    pids_limit: 100
+    security_opt:
+      - no-new-privileges:true
+    logging: *default-logging
+
+  api:
+    image: ${API_IMAGE_REPOSITORY:-ghcr.io/code-school-of-guam-alumni/party-games-hub-api}:${IMAGE_TAG:-main}
+    restart: unless-stopped
+    pull_policy: ${PULL_POLICY:-always}
+    env_file: .env.production
+    environment:
+      RAILS_ENV: production
+      RAILS_LOG_LEVEL: info
+      RAILS_MAX_THREADS: "3"
+      HOME: /rails/tmp
+      BUNDLE_USER_HOME: /rails/tmp/bundle
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      CACHE_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}_cache
+      QUEUE_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}_queue
+      CABLE_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}_cable
+      PARTY_GAMES_HUB_DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      FRONTEND_URLS: ${FRONTEND_URLS}
+    command: ["./bin/rails", "server", "-b", "0.0.0.0", "-p", "3000"]
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://127.0.0.1:3000/up"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 45s
+    networks:
+      - backend
+    read_only: true
+    tmpfs:
+      - /rails/tmp:size=64m,uid=1000,gid=1000,mode=0750
+      - /rails/log:size=16m,uid=1000,gid=1000,mode=0750
+    mem_limit: 512m
+    cpus: 1.0
+    pids_limit: 200
+    security_opt:
+      - no-new-privileges:true
+    logging: *default-logging
+
+  web:
+    image: ${WEB_IMAGE_REPOSITORY:-ghcr.io/code-school-of-guam-alumni/party-games-hub-web}:${IMAGE_TAG:-main}
+    restart: unless-stopped
+    pull_policy: ${PULL_POLICY:-always}
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - 127.0.0.1:${PARTY_GAMES_PORT:-8787}:8080
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--spider", "http://127.0.0.1:8080/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - frontend
+      - backend
+    read_only: true
+    tmpfs:
+      - /data:size=16m,uid=1000,gid=1000,mode=0750
+      - /config:size=4m,uid=1000,gid=1000,mode=0750
+      - /tmp:size=16m,uid=1000,gid=1000,mode=0750
+    mem_limit: 128m
+    cpus: 0.25
+    pids_limit: 100
+    security_opt:
+      - no-new-privileges:true
+    logging: *default-logging
+
+volumes:
+  postgres_data:
+
+networks:
+  frontend:
+  backend:
+    internal: true

@@ -61,4 +61,35 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - run: npm ci
       - run: npm run lint
+      - run: npm run test
       - run: npm run build
+
+  deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate shell scripts
+        run: bash -n ops/mac-mini/*.sh
+      - name: Validate LaunchDaemon property lists
+        run: |
+          python3 - <<'PY'
+          import glob
+          import plistlib
+
+          for path in glob.glob("ops/mac-mini/launchd/*.plist"):
+              with open(path, "rb") as plist:
+                  plistlib.load(plist)
+              print(f"valid: {path}")
+          PY
+      - name: Validate production Compose configuration
+        env:
+          POSTGRES_DB: party_games_hub_production
+          POSTGRES_USER: party_games_hub
+          POSTGRES_PASSWORD: validation-only
+          SECRET_KEY_BASE: validation-only
+          FRONTEND_URLS: https://party-games.shimizu-technology.com
+          PARTY_GAMES_PORT: 8787
+          IMAGE_TAG: main
+        run: |
+          cp env.production.example .env.production
+          docker compose --env-file .env.production -f compose.production.yml config --quiet
