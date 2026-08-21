@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import GuessTheNumberGame from './games/guess-the-number/GuessTheNumberGame'
 import './App.css'
 
 type Game = {
@@ -45,6 +46,7 @@ const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1
 function App() {
   const [games, setGames] = useState<Game[]>(starterGames)
   const [apiConnected, setApiConnected] = useState(false)
+  const [selectedGame, setSelectedGame] = useState<string | null>(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -65,6 +67,12 @@ function App() {
 
     return () => controller.abort()
   }, [])
+
+  // PR 1 uses a small view switch so the skeleton stays dependency-free.
+  // Shared routing can replace this when more game pages are ready.
+  if (selectedGame === 'guess-the-number') {
+    return <GuessTheNumberGame onBack={() => setSelectedGame(null)} />
+  }
 
   return (
     <main>
@@ -89,19 +97,28 @@ function App() {
         </div>
 
         <div className="game-grid">
-          {games.map((game) => (
-            <article className="game-card" key={game.slug}>
-              <div className="card-meta">
-                <span>{game.owner}</span>
-                <span>{game.play_mode}</span>
-              </div>
-              <h3>{game.name}</h3>
-              <p>{game.summary}</p>
-              <button type="button" disabled>
-                Coming through a team PR
-              </button>
-            </article>
-          ))}
+          {games.map((game) => {
+            const hasSkeleton = game.slug === 'guess-the-number'
+
+            return (
+              <article className="game-card" key={game.slug}>
+                <div className="card-meta">
+                  <span>{game.owner}</span>
+                  <span>{game.play_mode}</span>
+                </div>
+                <h3>{game.name}</h3>
+                <p>{game.summary}</p>
+                <button
+                  className={hasSkeleton ? 'game-card-action' : undefined}
+                  type="button"
+                  disabled={!hasSkeleton}
+                  onClick={() => setSelectedGame(game.slug)}
+                >
+                  {hasSkeleton ? 'View game skeleton' : 'Coming through a team PR'}
+                </button>
+              </article>
+            )
+          })}
         </div>
       </section>
 
