@@ -10,9 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_13_093100) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_21_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "guess_the_number_presets", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.text "description", null: false
+    t.integer "guess_rounds", null: false
+    t.text "instructions", null: false
+    t.integer "max_number", null: false
+    t.integer "min_number", null: false
+    t.string "name", null: false
+    t.integer "position", null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index "lower((slug)::text)", name: "index_guess_the_number_presets_on_lower_slug", unique: true
+    t.index ["active"], name: "index_guess_the_number_presets_on_active"
+    t.index ["position"], name: "index_guess_the_number_presets_on_position"
+  end
 
   create_table "imposter_word_packs", force: :cascade do |t|
     t.boolean "active", default: true, null: false

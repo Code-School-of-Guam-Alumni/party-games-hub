@@ -13,3 +13,5 @@ bin/rails server -p 3000
 Health check: `http://localhost:3000/up`
 
 Starter game catalog: `http://localhost:3000/api/v1/games`
+
+Guess the Number range presets: `http://localhost:3000/api/v1/guess_the_number_presets`
