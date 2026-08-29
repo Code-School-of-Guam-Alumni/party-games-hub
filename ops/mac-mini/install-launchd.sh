@@ -1,7 +1,7 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-if [[ $(id -u) -eq 0 ]]; then
+if [[ "$(id -un)" != "jerry" ]]; then
   echo "Run this script as jerry; it uses sudo only for LaunchDaemon installation." >&2
   exit 1
 fi
@@ -9,15 +9,29 @@ fi
 SERVICE_DIR=${PARTY_GAMES_SERVICE_DIR:-/Users/jerry/services/party-games-hub}
 LAUNCHD_DIR="$SERVICE_DIR/ops/mac-mini/launchd"
 BACKUP_DIR="/Volumes/T9/Backups/mac-mini-retirements/$(date +%Y%m%dT%H%M%S)-party-games-launchd"
+LABELS=(
+  com.shimizu.colima-autostart
+  com.shimizu.party-games-port-forward
+  com.shimizu.party-games-deploy
+  com.shimizu.party-games-backup
+  com.shimizu.party-games-tunnel
+)
+
+for label in "${LABELS[@]}"; do
+  source_plist="$LAUNCHD_DIR/$label.plist"
+  if [[ ! -f "$source_plist" ]]; then
+    echo "Missing launch service definition: $source_plist" >&2
+    exit 1
+  fi
+  if ! plutil -lint "$source_plist" >/dev/null; then
+    echo "Invalid launch service definition: $source_plist" >&2
+    exit 1
+  fi
+done
 
 mkdir -p "$BACKUP_DIR"
 
-for label in \
-  com.shimizu.colima-autostart \
-  com.shimizu.party-games-port-forward \
-  com.shimizu.party-games-deploy \
-  com.shimizu.party-games-backup \
-  com.shimizu.party-games-tunnel; do
+for label in "${LABELS[@]}"; do
   source_plist="$LAUNCHD_DIR/$label.plist"
   destination_plist="/Library/LaunchDaemons/$label.plist"
 
