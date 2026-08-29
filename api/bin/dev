@@ -1,2 +1,5 @@
 #!/usr/bin/env ruby
-exec "./bin/rails", "server", *ARGV
+host = ENV.fetch("PARTY_GAMES_DEV_API_HOST", "127.0.0.1")
+port = ENV.fetch("PARTY_GAMES_DEV_API_PORT", "43201")
+
+exec "./bin/rails", "server", "--binding", host, "--port", port, *ARGV

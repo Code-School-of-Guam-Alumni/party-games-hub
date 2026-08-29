@@ -25,8 +25,8 @@ The app uses a dedicated Compose network and volume. Host ports bind only to
 loopback. GitHub builds run on GitHub-hosted runners; the mini is not a
 self-hosted Actions runner and does not store a GitHub token.
 
-Party Games has a dedicated Colima profile with host-directory mounting and
-automatic host-port forwarding disabled. A supervised, explicit SSH tunnel
+Party Games has a dedicated Colima profile with no host-directory mounts and
+with automatic host-port forwarding disabled. A supervised, explicit SSH tunnel
 publishes only the guest's `127.0.0.1:8787` origin back to the same Mac mini
 loopback address. This avoids the event-driven forwarding failure that left
 healthy containers unreachable after a restart, without exposing the app to

@@ -7,8 +7,11 @@ Rails API for the Code School of Guam alumni internship project.
 ```bash
 bundle install
 bin/rails db:prepare
-bin/rails server -b 127.0.0.1 -p 43201
+bin/dev
 ```
+
+Override the default bind address or port with `PARTY_GAMES_DEV_API_HOST` and
+`PARTY_GAMES_DEV_API_PORT`.
 
 Health check: `http://127.0.0.1:43201/up`
 

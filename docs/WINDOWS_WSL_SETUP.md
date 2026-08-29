@@ -67,7 +67,7 @@ cd ~/code/party-games-hub/api
 bundle install
 bin/rails db:prepare
 bin/rails test
-bin/rails server -b 127.0.0.1 -p 43201
+bin/dev
 ```
 
 Visit `http://127.0.0.1:43201/up`.

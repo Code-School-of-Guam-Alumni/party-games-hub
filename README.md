@@ -48,8 +48,11 @@ Windows contributors should complete [`docs/WINDOWS_WSL_SETUP.md`](docs/WINDOWS_
 cd api
 bundle install
 bin/rails db:prepare
-bin/rails server -b 127.0.0.1 -p 43201
+bin/dev
 ```
+
+`bin/dev` reads `PARTY_GAMES_DEV_API_HOST` and `PARTY_GAMES_DEV_API_PORT`
+when you need to override the project defaults.
 
 Verify:
 

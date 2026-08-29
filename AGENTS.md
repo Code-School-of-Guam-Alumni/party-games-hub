@@ -33,6 +33,8 @@ These instructions apply to Pi and any other coding agent working in this reposi
 
 - Rails owns `127.0.0.1:43201` in development.
 - Vite owns `127.0.0.1:43202` in development and uses strict-port mode.
+- Start Rails with `api/bin/dev` so the project-specific bind settings are
+  applied consistently.
 - Override those defaults only with `PARTY_GAMES_DEV_API_HOST`,
   `PARTY_GAMES_DEV_API_PORT`, `PARTY_GAMES_DEV_WEB_HOST`, and
   `PARTY_GAMES_DEV_WEB_PORT`.
