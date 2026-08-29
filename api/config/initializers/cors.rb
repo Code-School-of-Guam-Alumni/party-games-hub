@@ -1,6 +1,6 @@
 frontend_origins = ENV.fetch(
   "FRONTEND_URLS",
-  "http://localhost:5173,http://127.0.0.1:5173"
+  "http://localhost:43202,http://127.0.0.1:43202"
 ).split(",").map(&:strip).reject(&:blank?)
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do

@@ -9,10 +9,11 @@
 - Local port: `127.0.0.1:8787`
 - Database backups: `/Volumes/T9/Backups/party-games-hub/postgres`
 
-The Party Games VM has 2 CPUs, 2 GiB of memory, a 20 GiB disk, and no host
-directory mounts. Its containers have their own CPU, memory, PID, and log
-limits. Only the local reverse proxy port is published; Cloudflare Tunnel is
-the public entry point.
+The Party Games VM has 2 CPUs, 2 GiB of memory, a 20 GiB disk, no host
+directory mounts, and no automatic Colima port forwarder. Its containers have
+their own CPU, memory, PID, and log limits. A supervised SSH tunnel publishes
+only the guest's reverse-proxy port to the same port on Mac mini loopback;
+Cloudflare Tunnel is the public entry point.
 
 ## How deployment works
 
@@ -21,8 +22,10 @@ the public entry point.
 3. After those checks pass, GitHub builds immutable ARM64 API and web images.
 4. The images are published to public GHCR packages using the merge commit SHA.
 5. The Mac mini checks the latest successful release every three minutes.
-6. It backs up PostgreSQL, prepares the database, starts the new containers,
-   runs health checks, and records the SHA only after the release is healthy.
+6. For a changed SHA, it backs up PostgreSQL once, prepares the database,
+   starts the new containers, runs health checks, and records the SHA only
+   after the release is healthy. Reconciliation of an unhealthy current SHA
+   does not create another backup.
 7. If health checks fail, the deploy script returns to the previous image SHA.
 
 The mini is pull-only. It is not a GitHub Actions runner and stores no GitHub

@@ -28,8 +28,9 @@
 threads_count = ENV.fetch("RAILS_MAX_THREADS", 3)
 threads threads_count, threads_count
 
-# Specifies the `port` that Puma will listen on to receive requests; default is 3000.
-port ENV.fetch("PORT", 3000)
+# Party Games owns a project-specific development port. Production supplies an
+# explicit container port and does not publish this default on the host.
+port ENV.fetch("PORT", ENV.fetch("PARTY_GAMES_DEV_API_PORT", 43_201))
 
 # Allow puma to be restarted by `bin/rails restart` command.
 plugin :tmp_restart

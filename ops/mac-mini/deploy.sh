@@ -1,7 +1,6 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-export HOME=/Users/jerry
 export PATH=/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/Applications/Docker.app/Contents/Resources/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
 SERVICE_DIR=${PARTY_GAMES_SERVICE_DIR:-/Users/jerry/services/party-games-hub}
@@ -101,7 +100,8 @@ export IMAGE_TAG="sha-$latest_sha"
 echo "Pulling Party Games images for $latest_sha..."
 "$DOCKER_BIN" compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" pull api web
 
-if "$DOCKER_BIN" compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps --status running db --quiet | grep -q .; then
+if [[ "$latest_sha" != "$current_sha" ]] && \
+   "$DOCKER_BIN" compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps --status running db --quiet | grep -q .; then
   "$SERVICE_DIR/ops/mac-mini/backup.sh" predeploy
 fi
 

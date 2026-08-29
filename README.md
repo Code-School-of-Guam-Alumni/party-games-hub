@@ -48,13 +48,13 @@ Windows contributors should complete [`docs/WINDOWS_WSL_SETUP.md`](docs/WINDOWS_
 cd api
 bundle install
 bin/rails db:prepare
-bin/rails server -p 3000
+bin/rails server -b 127.0.0.1 -p 43201
 ```
 
 Verify:
 
-- `http://localhost:3000/up`
-- `http://localhost:3000/api/v1/games`
+- `http://127.0.0.1:43201/up`
+- `http://127.0.0.1:43201/api/v1/games`
 
 ### Web
 
@@ -66,7 +66,8 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173`.
+Open `http://127.0.0.1:43202`. Vite uses this strict project-specific port and
+will fail clearly instead of moving to another port when it is occupied.
 
 ## How we work
 

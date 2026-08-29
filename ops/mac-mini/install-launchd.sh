@@ -14,6 +14,7 @@ mkdir -p "$BACKUP_DIR"
 
 for label in \
   com.shimizu.colima-autostart \
+  com.shimizu.party-games-port-forward \
   com.shimizu.party-games-deploy \
   com.shimizu.party-games-backup \
   com.shimizu.party-games-tunnel; do

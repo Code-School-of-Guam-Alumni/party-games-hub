@@ -1,7 +1,6 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-export HOME=/Users/jerry
 export PATH=/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
 PROFILE=party-games
@@ -47,9 +46,11 @@ sleep 3
 
 if ! colima start \
   --profile "$PROFILE" \
+  --activate=false \
   --cpu 2 \
   --memory 2 \
   --disk 20 \
+  --port-forwarder none \
   --mount-inotify=false \
   --mount none >> "$LOG" 2>&1; then
   printf '[%s] ERROR: Party Games Colima failed to start.\n' "$(date)" >> "$LOG"
