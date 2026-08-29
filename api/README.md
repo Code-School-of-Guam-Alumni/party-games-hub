@@ -7,9 +7,12 @@ Rails API for the Code School of Guam alumni internship project.
 ```bash
 bundle install
 bin/rails db:prepare
-bin/rails server -p 3000
+bin/dev
 ```
 
-Health check: `http://localhost:3000/up`
+Override the default bind address or port with `PARTY_GAMES_DEV_API_HOST` and
+`PARTY_GAMES_DEV_API_PORT`.
 
-Starter game catalog: `http://localhost:3000/api/v1/games`
+Health check: `http://127.0.0.1:43201/up`
+
+Starter game catalog: `http://127.0.0.1:43201/api/v1/games`

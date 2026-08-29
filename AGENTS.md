@@ -29,6 +29,18 @@ These instructions apply to Pi and any other coding agent working in this reposi
 5. Summarize changed files and test results for the student.
 6. The student—not the agent—must review, understand, commit, and explain the work.
 
+## Local runtime
+
+- Rails owns `127.0.0.1:43201` in development.
+- Vite owns `127.0.0.1:43202` in development and uses strict-port mode.
+- Start Rails with `api/bin/dev` so the project-specific bind settings are
+  applied consistently.
+- Override those defaults only with `PARTY_GAMES_DEV_API_HOST`,
+  `PARTY_GAMES_DEV_API_PORT`, `PARTY_GAMES_DEV_WEB_HOST`, and
+  `PARTY_GAMES_DEV_WEB_PORT`.
+- Production publishes only `127.0.0.1:8787` on the Mac mini. Container-internal
+  ports such as 3000 and 8080 do not occupy those ports on the host.
+
 ## Verification
 
 API changes:

@@ -25,9 +25,13 @@ The app uses a dedicated Compose network and volume. Host ports bind only to
 loopback. GitHub builds run on GitHub-hosted runners; the mini is not a
 self-hosted Actions runner and does not store a GitHub token.
 
-Party Games has a dedicated Colima profile with host-directory mounting
-disabled. This lets its system LaunchDaemon recover the app before console
-login. Immich remains in the default Colima profile and starts from its
+Party Games has a dedicated Colima profile with no host-directory mounts and
+with automatic host-port forwarding disabled. A supervised, explicit SSH tunnel
+publishes only the guest's `127.0.0.1:8787` origin back to the same Mac mini
+loopback address. This avoids the event-driven forwarding failure that left
+healthy containers unreachable after a restart, without exposing the app to
+the LAN. This lets its system LaunchDaemon recover the app before console
+login. Immich remains in its separate profile and starts from its
 Homebrew LaunchAgent after Jerry logs in because that VM requires the external
 T9 share. The Party Games VM never mounts T9; the host mounts T9 only for the
 backup script.
@@ -76,7 +80,8 @@ migration.
 ## Launch services
 
 `install-launchd.sh` installs boot-level services for the dedicated Party Games
-Colima profile, deployment polling, daily backups, and the Cloudflare tunnel.
+Colima profile, explicit loopback forward, deployment polling, daily backups,
+and the Cloudflare tunnel.
 It leaves the default Colima login agent enabled for Immich. Validate the full
 setup with an unattended reboot before treating the service as boot-resilient.
 

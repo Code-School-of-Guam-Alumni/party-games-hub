@@ -29,7 +29,7 @@ type Phase =
 
 type Winner = 'regulars' | 'imposter'
 
-const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1'
+const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:43201/api/v1'
 const initialPlayers = ['Player 1', 'Player 2', 'Player 3', 'Player 4']
 const phaseLabels: Record<Phase, string> = {
   setup: 'Final polish',

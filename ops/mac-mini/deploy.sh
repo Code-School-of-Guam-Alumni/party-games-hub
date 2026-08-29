@@ -1,7 +1,6 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-export HOME=/Users/jerry
 export PATH=/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/Applications/Docker.app/Contents/Resources/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
 SERVICE_DIR=${PARTY_GAMES_SERVICE_DIR:-/Users/jerry/services/party-games-hub}
@@ -101,7 +100,25 @@ export IMAGE_TAG="sha-$latest_sha"
 echo "Pulling Party Games images for $latest_sha..."
 "$DOCKER_BIN" compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" pull api web
 
-if "$DOCKER_BIN" compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps --status running db --quiet | grep -q .; then
+if [[ "$latest_sha" != "$current_sha" ]]; then
+  echo "Starting PostgreSQL for the pre-deployment recovery backup..."
+  "$DOCKER_BIN" compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d db
+
+  database_ready=0
+  for _ in $(seq 1 "${DATABASE_HEALTH_ATTEMPTS:-30}"); do
+    if "$DOCKER_BIN" compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" exec -T db \
+      pg_isready --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" >/dev/null 2>&1; then
+      database_ready=1
+      break
+    fi
+    sleep "${DATABASE_HEALTH_INTERVAL:-2}"
+  done
+
+  if [[ "$database_ready" != "1" ]]; then
+    echo "Party Games database did not become ready; refusing to deploy without a recovery backup." >&2
+    exit 1
+  fi
+
   "$SERVICE_DIR/ops/mac-mini/backup.sh" predeploy
 fi
 

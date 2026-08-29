@@ -42,7 +42,7 @@ const starterGames: Game[] = [
   },
 ]
 
-const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1'
+const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:43201/api/v1'
 
 function App() {
   const [games, setGames] = useState<Game[]>(starterGames)

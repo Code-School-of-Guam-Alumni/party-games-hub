@@ -67,10 +67,10 @@ cd ~/code/party-games-hub/api
 bundle install
 bin/rails db:prepare
 bin/rails test
-bin/rails server -p 3000
+bin/dev
 ```
 
-Visit `http://localhost:3000/up`.
+Visit `http://127.0.0.1:43201/up`.
 
 ## 7. Install and run the web app
 
@@ -83,7 +83,7 @@ npm run lint
 npm run dev
 ```
 
-Visit `http://localhost:5173`.
+Visit `http://127.0.0.1:43202`.
 
 The page should report **Rails API connected** when both processes are running.
 
@@ -117,7 +117,7 @@ bin/rails db:prepare
 
 ### Web page shows starter catalog
 
-Confirm Rails is running on port 3000, then refresh the browser.
+Confirm Rails is running on port 43201, then refresh the browser.
 
 ### Files are slow or permissions behave strangely
 

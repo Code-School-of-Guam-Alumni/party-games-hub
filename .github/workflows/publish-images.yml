@@ -10,8 +10,8 @@ permissions:
   packages: write
 
 concurrency:
-  group: production-images-${{ github.event.workflow_run.head_branch }}
-  cancel-in-progress: true
+  group: production-images-${{ github.event.workflow_run.head_sha }}
+  cancel-in-progress: false
 
 jobs:
   publish:
@@ -45,9 +45,7 @@ jobs:
           context: api
           platforms: linux/arm64
           push: true
-          tags: |
-            ${{ env.API_IMAGE }}:sha-${{ env.IMAGE_SHA }}
-            ${{ env.API_IMAGE }}:main
+          tags: ${{ env.API_IMAGE }}:sha-${{ env.IMAGE_SHA }}
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.revision=${{ env.IMAGE_SHA }}
@@ -62,9 +60,7 @@ jobs:
           context: web
           platforms: linux/arm64
           push: true
-          tags: |
-            ${{ env.WEB_IMAGE }}:sha-${{ env.IMAGE_SHA }}
-            ${{ env.WEB_IMAGE }}:main
+          tags: ${{ env.WEB_IMAGE }}:sha-${{ env.IMAGE_SHA }}
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.revision=${{ env.IMAGE_SHA }}

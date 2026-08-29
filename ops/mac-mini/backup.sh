@@ -1,7 +1,6 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-export HOME=/Users/jerry
 export PATH=/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/Applications/Docker.app/Contents/Resources/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
 SERVICE_DIR=${PARTY_GAMES_SERVICE_DIR:-/Users/jerry/services/party-games-hub}
