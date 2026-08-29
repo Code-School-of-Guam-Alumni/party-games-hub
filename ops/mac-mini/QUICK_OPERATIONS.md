@@ -7,7 +7,8 @@
 - Service directory: `/Users/jerry/services/party-games-hub`
 - Runtime: dedicated Colima profile named `party-games`
 - Local port: `127.0.0.1:8787`
-- Database backups: `/Volumes/T9/Backups/party-games-hub/postgres`
+- Automatic database backups: `/Users/jerry/Backups/party-games-hub/postgres`
+- Verified second copy: `/Volumes/T9/Backups/party-games-hub/postgres`
 
 The Party Games VM has 2 CPUs, 2 GiB of memory, a 20 GiB disk, no host
 directory mounts, and no automatic Colima port forwarder. Its containers have
@@ -85,12 +86,15 @@ Create and verify a backup:
 ```bash
 cd /Users/jerry/services/party-games-hub
 ./ops/mac-mini/backup.sh manual
-gzip -t "$(ls -1t /Volumes/T9/Backups/party-games-hub/postgres/*.dump.gz | head -n 1)"
+gzip -t "$(ls -1t /Users/jerry/Backups/party-games-hub/postgres/*.dump.gz | head -n 1)"
+./ops/mac-mini/archive-backups-to-t9.sh
 ```
 
-The backup script refuses to write if T9 is not mounted. This prevents an
-apparently successful backup from being written into an empty `/Volumes/T9`
-directory on the internal disk.
+Launchd writes automatic backups to the protected internal directory because
+macOS removable-volume privacy blocks the service from writing directly to T9.
+Run the archive command from an interactive SSH session; it refuses to run if
+T9 is not mounted, verifies every new copy, and never overwrites different
+contents under the same filename.
 
 ## Manual release recovery
 

@@ -8,7 +8,7 @@ fi
 
 SERVICE_DIR=${PARTY_GAMES_SERVICE_DIR:-/Users/jerry/services/party-games-hub}
 LAUNCHD_DIR="$SERVICE_DIR/ops/mac-mini/launchd"
-BACKUP_DIR="/Volumes/T9/Backups/mac-mini-retirements/$(date +%Y%m%dT%H%M%S)-party-games-launchd"
+BACKUP_DIR="/Users/jerry/Backups/mac-mini-retirements/$(date +%Y%m%dT%H%M%S)-party-games-launchd"
 LABELS=(
   com.shimizu.colima-autostart
   com.shimizu.party-games-port-forward
