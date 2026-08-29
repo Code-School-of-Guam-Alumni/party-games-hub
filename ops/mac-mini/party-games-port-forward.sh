@@ -26,6 +26,16 @@ if [[ ! -f "$SSH_CONFIG" ]]; then
   exit 1
 fi
 
+# Colima can recreate the old mux-managed 8787 forward when it restores a
+# container with a published port, even with portForwarder set to none. Cancel
+# only that exact mux forward before the supervised, ControlMaster-free tunnel
+# claims the same loopback address. A missing mux forward is already the desired
+# state and is therefore harmless.
+/usr/bin/ssh -F "$SSH_CONFIG" \
+  -O cancel \
+  -L "127.0.0.1:${LOCAL_PORT}:127.0.0.1:${LOCAL_PORT}" \
+  "$SSH_HOST" >/dev/null 2>&1 || true
+
 # Colima's event-driven host forwarding has failed to restore published ports
 # after VM restarts on this host. Keep one explicit TCP tunnel instead. The VM
 # itself publishes 127.0.0.1:8787, so this forwards only that loopback origin

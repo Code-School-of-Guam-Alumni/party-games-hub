@@ -16,7 +16,8 @@ and records the commit only after health checks pass.
 - Compose project: `party-games-hub`
 - Local origin: `http://127.0.0.1:8787`
 - Public origin: `https://party-games.shimizu-technology.com`
-- Database backups: `/Volumes/T9/Backups/party-games-hub/postgres`
+- Automatic database backups: `/Users/jerry/Backups/party-games-hub/postgres`
+- Verified second copy: `/Volumes/T9/Backups/party-games-hub/postgres`
 - Images: public GHCR packages tagged `sha-<full commit SHA>`
 - Docker profile: `party-games` (2 CPUs, 2 GiB memory, 20 GiB disk)
 - Docker socket: `/Users/jerry/.colima/party-games/docker.sock`
@@ -28,13 +29,14 @@ self-hosted Actions runner and does not store a GitHub token.
 Party Games has a dedicated Colima profile with no host-directory mounts and
 with automatic host-port forwarding disabled. A supervised, explicit SSH tunnel
 publishes only the guest's `127.0.0.1:8787` origin back to the same Mac mini
-loopback address. This avoids the event-driven forwarding failure that left
+loopback address. Before binding, it cancels only Colima's exact mux-managed
+8787 forward because Colima can recreate that listener even when its saved
+forwarder setting is `none`. This avoids the event-driven forwarding failure that left
 healthy containers unreachable after a restart, without exposing the app to
 the LAN. This lets its system LaunchDaemon recover the app before console
 login. Immich remains in its separate profile and starts from its
 Homebrew LaunchAgent after Jerry logs in because that VM requires the external
-T9 share. The Party Games VM never mounts T9; the host mounts T9 only for the
-backup script.
+T9 share. The Party Games VM never mounts T9.
 
 ## Required host file
 
@@ -63,11 +65,19 @@ Create a verified compressed backup:
 ./ops/mac-mini/backup.sh manual
 ```
 
+Automatic and pre-deployment backups stay on the internal disk because macOS
+blocks this LaunchDaemon from writing directly to removable volumes. From an
+interactive SSH session, copy and verify every new archive on T9:
+
+```bash
+./ops/mac-mini/archive-backups-to-t9.sh
+```
+
 Restore into a stopped application after selecting the exact backup:
 
 ```bash
 docker compose --env-file .env.production -f compose.production.yml stop api web
-gunzip -c /Volumes/T9/Backups/party-games-hub/postgres/<backup>.dump.gz |
+gunzip -c /Users/jerry/Backups/party-games-hub/postgres/<backup>.dump.gz |
   docker compose --env-file .env.production -f compose.production.yml exec -T db \
     pg_restore --clean --if-exists --no-owner --username party_games_hub \
       --dbname party_games_hub_production
@@ -85,9 +95,10 @@ and the Cloudflare tunnel.
 It leaves the default Colima login agent enabled for Immich. Validate the full
 setup with an unattended reboot before treating the service as boot-resilient.
 
-The Colima boot script retries the T9 host mount while starting Docker. The
-backup script fails safely if T9 is absent instead of writing into an empty
-`/Volumes/T9` directory on the internal disk.
+The runtime never depends on T9 being mounted. The manual archive script fails
+safely if T9 is absent instead of writing into an empty `/Volumes/T9`
+directory on the internal disk. It verifies gzip integrity and refuses to
+overwrite a same-name archive with different contents.
 
 ## Verification
 
